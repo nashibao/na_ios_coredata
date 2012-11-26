@@ -54,6 +54,10 @@ static NSManagedObjectContext * __main_context__ = nil;
     return [[self mainContext] getOrCreateObject:NSStringFromClass(self) props:props];
 }
 
++ (id)objectWithID:(NSManagedObjectID *)objectID{
+    [[self mainContext] objectWithID:objectID];
+}
+
 + (void)filter:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(NSArray *mos))complete{
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         NSArray *mos = [context filterObjects:NSStringFromClass(self) props:props];
@@ -116,13 +120,35 @@ static NSManagedObjectContext * __main_context__ = nil;
 
 + (NSFetchedResultsController *)controllerWithEqualProps:(NSDictionary *)equalProps sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
     NSFetchRequest *req = [self requestWithEqualProps:equalProps sorts:sorts options:options];
-    if(!context)
-        context = [self mainContext];
-    NSFetchedResultsController *frc = [[NSFetchedResultsController alloc] initWithFetchRequest:req managedObjectContext:context sectionNameKeyPath:options[@"sectionNameKeyPath"] cacheName:nil];
-    return frc;
+    return [self controllerWithRequest:req context:context options:options];
 }
 
 + (NSFetchRequest *)requestWithEqualProps:(NSDictionary *)equalProps sorts:(NSArray *)sorts options:(NSDictionary *)options{
+    NSPredicate *pred = nil;
+    if(equalProps && [equalProps count] > 0)
+        pred = [NSPredicate predicateForEqualProps:equalProps];
+    return [self requestWithPredicate:pred sorts:sorts options:options];
+}
+
++ (NSFetchedResultsController *)controllerWithProps:(NSArray *)props sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
+    NSFetchRequest *req = [self requestWithProps:props sorts:sorts options:options];
+    return [self controllerWithRequest:req context:context options:options];
+}
+
+
++ (NSFetchRequest *)requestWithProps:(NSArray *)props sorts:(NSArray *)sorts options:(NSDictionary *)options{
+    NSPredicate *pred = nil;
+    if(props && [props count] > 0)
+        pred = [NSPredicate predicateForProps:props];
+    return [self requestWithPredicate:pred sorts:sorts options:options];
+}
+
++ (NSFetchedResultsController *)controllerWithPredicate:(NSPredicate *)predicate sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
+    NSFetchRequest *req = [self requestWithPredicate:predicate sorts:sorts options:options];
+    return [self controllerWithRequest:req context:context options:options];
+}
+
++ (NSFetchRequest *)requestWithPredicate:(NSPredicate *)predicate sorts:(NSArray *)sorts options:(NSDictionary *)options{
     NSString *class_name = [NSString stringWithCString:class_getName(self) encoding:NSUTF8StringEncoding];
     NSFetchRequest *req = [NSFetchRequest fetchRequestWithEntityName:class_name];
     NSMutableArray *_sorts = [@[] mutableCopy];
@@ -138,36 +164,17 @@ static NSManagedObjectContext * __main_context__ = nil;
         [_sorts addObject:sd];
     }
     [req setSortDescriptors:_sorts];
-    NSPredicate *pred = nil;
-    if(equalProps && [equalProps count] > 0)
-        pred = [NSPredicate predicateForEqualProps:equalProps];
-    if(pred)
-        [req setPredicate:pred];
+    [req setSortDescriptors:_sorts];
+    if(predicate)
+        [req setPredicate:predicate];
     return req;
 }
 
-+ (NSFetchedResultsController *)controllerWithProps:(NSArray *)props sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
-    NSFetchRequest *req = [self requestWithProps:props sorts:sorts options:options];
-    NSFetchedResultsController *frc = [[NSFetchedResultsController alloc] initWithFetchRequest:req managedObjectContext:context sectionNameKeyPath:nil cacheName:nil];
++ (NSFetchedResultsController *)controllerWithRequest:(NSFetchRequest *)request context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
+    if(!context)
+        context = [self mainContext];
+    NSFetchedResultsController *frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:context sectionNameKeyPath:options[@"sectionNameKeyPath"] cacheName:nil];
     return frc;
 }
-
-+ (NSFetchRequest *)requestWithProps:(NSArray *)props sorts:(NSArray *)sorts options:(NSDictionary *)options{
-    NSString *class_name = [NSString stringWithCString:class_getName(self) encoding:NSUTF8StringEncoding];
-    NSFetchRequest *req = [NSFetchRequest fetchRequestWithEntityName:class_name];
-    NSMutableArray *_sorts = [@[] mutableCopy];
-    for(NSString *sort in sorts){
-        NSSortDescriptor *sd = [[NSSortDescriptor alloc] initWithKey:sort ascending:NO];
-        [_sorts addObject:sd];
-    }
-    [req setSortDescriptors:_sorts];
-    NSPredicate *pred = nil;
-    if(props && [props count] > 0)
-        pred = [NSPredicate predicateForProps:props];
-    if(pred)
-        [req setPredicate:pred];
-    return req;
-}
-
 
 @end

@@ -18,6 +18,7 @@
 + (id)get:(NSDictionary *)props options:(NSDictionary *)options;
 + (id)create:(NSDictionary *)props options:(NSDictionary *)options;
 + (id)get_or_create:(NSDictionary *)props options:(NSDictionary *)options;
++ (id)objectWithID:(NSManagedObjectID *)objectID;
 
 
 #warning !! completeハンドラで返す値はmain threadで扱えない．NSManagedObjectIDの列に修正すべき！
@@ -36,5 +37,7 @@
 + (NSFetchRequest *)requestWithEqualProps:(NSDictionary *)equalProps sorts:(NSArray *)sorts options:(NSDictionary *)options;
 + (NSFetchedResultsController *)controllerWithProps:(NSArray *)props sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options;
 + (NSFetchRequest *)requestWithProps:(NSArray *)props sorts:(NSArray *)sorts options:(NSDictionary *)options;
++ (NSFetchedResultsController *)controllerWithPredicate:(NSPredicate *)predicate sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options;
++ (NSFetchRequest *)requestWithPredicate:(NSPredicate *)predicate sorts:(NSArray *)sorts options:(NSDictionary *)options;
 
 @end
