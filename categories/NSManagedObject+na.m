@@ -55,7 +55,7 @@ static NSManagedObjectContext * __main_context__ = nil;
 }
 
 + (id)objectWithID:(NSManagedObjectID *)objectID{
-    [[self mainContext] objectWithID:objectID];
+    return [[self mainContext] objectWithID:objectID];
 }
 
 + (void)filter:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(NSArray *mos))complete{
