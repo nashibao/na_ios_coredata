@@ -24,6 +24,14 @@ NSString * const NAModelControllerInitializedNotification = @"NAModelControllerI
     return self;
 }
 
+- (id)initWithoutSetup{
+    self = [super init];
+    if(self){
+        self.bundle = [NSBundle mainBundle];
+    }
+    return self;
+}
+
 
 - (NSString *)directoryPath{
     return [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
@@ -71,6 +79,15 @@ NSString * const NAModelControllerInitializedNotification = @"NAModelControllerI
         [[NSFileManager defaultManager] removeItemAtPath:store_file_name error:nil];
         [[NSNotificationCenter defaultCenter] postNotificationName:NAModelControllerDestroyedNotification object:self];
         [self setup];
+    }
+}
+
++ (void)destroy{
+    NAModelController *controller = [[[self class] alloc] initWithoutSetup];
+    NSString *store_file_name = [controller storeFileName];
+    if([[NSFileManager defaultManager] fileExistsAtPath:store_file_name]){
+        [[NSFileManager defaultManager] removeItemAtPath:store_file_name error:nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName:NAModelControllerDestroyedNotification object:self];
     }
 }
 

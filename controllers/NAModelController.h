@@ -41,6 +41,7 @@ extern NSString * const NAModelControllerInitializedNotification;
 /** 初期化処理．すでにあるデータベースは削除する
  */
 - (void)destroyAndSetup;
++ (void)destroy;
 
 /*
  migrations
