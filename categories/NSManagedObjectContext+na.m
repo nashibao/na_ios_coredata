@@ -112,6 +112,7 @@
     NSPersistentStoreCoordinator *coordinator = self.persistentStoreCoordinator;
     NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     [context setPersistentStoreCoordinator:coordinator];
+    context.mergePolicy = NSOverwriteMergePolicy;
     if(afterSaveOnMainThread){
         [[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:context queue:nil usingBlock:^(NSNotification *note) {
             [self performSelectorOnMainThread:@selector(mergeChangesFromContextDidSaveNotification:)
