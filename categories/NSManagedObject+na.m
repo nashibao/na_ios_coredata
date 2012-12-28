@@ -120,7 +120,9 @@ static NSManagedObjectContext * __main_context__ = nil;
 
 + (NSFetchedResultsController *)controllerWithEqualProps:(NSDictionary *)equalProps sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
     NSFetchRequest *req = [self requestWithEqualProps:equalProps sorts:sorts options:options];
-    return [self controllerWithRequest:req context:context options:options];
+    NSFetchedResultsController *frc = [self controllerWithRequest:req context:context options:options];
+    [frc performFetch:nil];
+    return frc;
 }
 
 + (NSFetchRequest *)requestWithEqualProps:(NSDictionary *)equalProps sorts:(NSArray *)sorts options:(NSDictionary *)options{
