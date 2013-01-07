@@ -1,4 +1,4 @@
-# `na_ios/coredata`
+`na_ios/coredata`
 
 `na_ios/coredata`は、扱うのに経験が必要なcoredataを、簡単に扱えるようにするモジュールです．
 
@@ -76,49 +76,77 @@ NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcur
 
 # 設定方法
 
-現状のところ、`na_ios/coredata`を使うには`na_ios`(`git@github.com:nashibao/na_ios.git`)ごとcloneしてくるしかありません．
-
-設定方法は以下のようになります．
-
-`ModelController`クラスの実装と`NSManagedObject`のサブクラスである`TestObject`のカテゴリの実装をするだけです．
+`hoge.modeld`の中に`TestObject`と`TestObject2`が入っている場合、AppDelegateなどで、次のように書いて下さい．
 
 ```objective-c
-
-#import "NAModelController.h"
-@interface ModelController : NAModelController
-+ (ModelController *)sharedController;
-@end
-
-#import "SingletonMacros.h"
-#import "ModelController.h"
-@implementation ModelController
-SHARED_CONTROLLER(ModelController)
-- (NSString *)name{
-    return @"hoge";
-}
-@end
-```
-```objective-c
-
-#import "NSManagedObject+na.h"
-@interface TestObject(na)
-@end
-
-#import "TestObject+na.h"
-#import "ModelController.h"
-@implementation TestObject (na)
-
-+ (NSManagedObjectContext *)mainContext{
-    return [[ModelController sharedController] mainContext];
-}
-@end
+NAModelController *controller = [NAModelController createControllerByName:@"hoge" bundle:nil];
+[controller addManagedObjectClasses:@[[TestObject class], [TestObject2 class]]];
 ```
 
-`ModelController`の名前には、modeldの名前を入れて下さい．(`hoge.xcdatamodeld`ならば`hoge`です．この場合`hoge.sqlite`にデータは保存されます．)
 これで晴れて`na_ios/coredata`の全ての機能を使う事が出来ます．
 
+# `magicalpanda/MagicalRecord`との比較
 
-# 個々のパッケージ
+同じような目的のモジュールに、[magicalpanda/MagicalRecord](https://github.com/magicalpanda/MagicalRecord)があります．`magicalpanda/MagicalRecord`の“Performing Core Data operations on Threads“の章も合わせて参照して下さい．
+
+`magicalpanda/MagicalRecord`では、filteringやsortingにメリットがあります．`na_ios/coredata`に含まれていないような複雑なフェッチを行うことができます．
+これに対して、`na_ios/coredata`では複雑なfilteringやsortingを介するフェッチには`NSFetchedResultsController`経由で行い、`NSArray`を介さない方法を推奨しています．これは、`UITableViewController`などと併用する場合、パフォーマンスとメモリの観点において都合が良いからです．
+
+`NSFetchedResultsController`と`UITableViewController`を`na_ios/coredata`で使うには`na_ios/coredata_ui`を参照して下さい．
+
+`na_ios/coredata`ではフェッチに自由度がない代わりに、フェッチやインサートに非同期のメソッドを持っています．これらを使う事でUIのブロックを防ぐことを念頭におきつつ、複雑なスレッドプログラミングを隠蔽することを目的にしています．
+
+`magicalpanda/MagicalRecord`も分かりやすいAPIを持ったすばらしいモジュールです．上記の比較事項を念頭に入れて、プログラマはどちらのライブラリを選ぶかを選択することができます．
+
+# スキーマレス・コアデータのススメ
+
+`na_ios/coredata`では、次の理由から、スキーマレスな`NSManagedObject`を推奨しています．
+
+ 1. スキーマ変更によるアップデート時のmigration
+ 2. サーバサイドのスキーマ変更への追従
+ 3. json形式でのサーバとの同期
+
+1,2は非常にめんどうな問題です．サーバ側にしろクライアント側にしろスキーマ変更によるマイグレーションはユーザ、開発者にとって非常に手間のかかる、バグの混入しやすい作業です．一般的なwebアプリケーションとは異なり、ネイティブアプリケーションの場合、アップデート時にしかスキーマを変更出来ません．また、今までの経験上、スキーマに定義されるフィールドの多くは、わざわざカラムに持つ必要の無いものです．
+そこで、NSManagedObjectのデータは一つのNSDictionary(JSON)として持ち、INDEXの用途にのみattributeを定義する方法を紹介します．
+
+```objective-c
+#import "NSManagedObject+json.h"
+```
+
+をimportするとNSManagedObjectにupdateByJSONというAPIを生やしてくれます．
+
+```objective-c
+SchemalessModel *obj = [SchemalessModel create:@{} options:nil];
+NSDictionary *json = @{
+	@"prop1": @"hoge", 
+	@"subdoc": @{
+		@"prop2": @"fuga"
+	}
+};
+[obj updateByJSON:json];
+```
+
+こうすることで、SchemalessModelがprop1やsubdoc__prop2というattributeを持っていた場合、そこに@"hoge"と@"fuga"をマッピングしてくれます．ただし、次に述べるように、マッピングはしなくても利用することが出来ます．attributeにする場合は、その値で検索やソートをしたい場合に限って下さい．
+またdata(デフォルト．変更化)というattributeにupdateByJSONに渡したjsonそのものを格納しておいてくれます．
+
+これを利用するのは次のようなイメージです．
+
+```objective-c
+SchemalessModel *obj = [SchemalessModel get:@{} options:nil];
+[cell.textLabel setText:obj.data[@"prop1"]]
+or
+[cell.textLabel setText:obj.prop1]
+```
+
+このようにすることで、マイグレーションのコストを押さえるのに加えて、数多くのフィールドを削減して、コードをクリーンに保つことが出来るでしょう．
+
+# 依存関係
+
+依存元：**なし**  
+依存先: **na_ios/coredata_ui**, **na_ios/coredata_sync**
+
+
+# 補足情報 個々のパッケージ
 
 ## coredata/categories
 コアデータに関わる各種クラスのカテゴリが入っているパッケージになります．
@@ -155,22 +183,3 @@ modeldファイル(`hoge.modeld`)の名前(`hoge`)を`name`に設定して、`se
 #### `models/NSDictionaryTransformer`
 
 dictionaryとsqlite内のバイナリを自動変換するクラス
-
-
-# `magicalpanda/MagicalRecord`との比較
-
-同じような目的のモジュールに、[magicalpanda/MagicalRecord](https://github.com/magicalpanda/MagicalRecord)があります．`magicalpanda/MagicalRecord`の“Performing Core Data operations on Threads“の章も合わせて参照して下さい．
-
-`magicalpanda/MagicalRecord`では、filteringやsortingにメリットがあります．`na_ios/coredata`に含まれていないような複雑なフェッチを行うことができます．
-これに対して、`na_ios/coredata`では複雑なfilteringやsortingを介するフェッチには`NSFetchedResultsController`経由で行い、`NSArray`を介さない方法を推奨しています．これは、`UITableViewController`などと併用する場合、パフォーマンスとメモリの観点において都合が良いからです．
-
-`NSFetchedResultsController`と`UITableViewController`を`na_ios/coredata`で使うには`na_ios/coredata_ui`を参照して下さい．
-
-`na_ios/coredata`ではフェッチに自由度がない代わりに、フェッチやインサートに非同期のメソッドを持っています．これらを使う事でUIのブロックを防ぐことを念頭におきつつ、複雑なスレッドプログラミングを隠蔽することを目的にしています．
-
-`magicalpanda/MagicalRecord`も分かりやすいAPIを持ったすばらしいモジュールです．上記の比較事項を念頭に入れて、プログラマはどちらのライブラリを選ぶかを選択することができます．
-
-# 依存関係
-
-依存元：**なし**  
-依存先: **na_ios/coredata_ui**, **na_ios/coredata_sync**
