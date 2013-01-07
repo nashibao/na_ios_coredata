@@ -107,7 +107,7 @@ NAModelController *controller = [NAModelController createControllerByName:@"hoge
  3. json形式でのサーバとの同期
 
 1,2は非常にめんどうな問題です．サーバ側にしろクライアント側にしろスキーマ変更によるマイグレーションはユーザ、開発者にとって非常に手間のかかる、バグの混入しやすい作業です．一般的なwebアプリケーションとは異なり、ネイティブアプリケーションの場合、アップデート時にしかスキーマを変更出来ません．また、今までの経験上、スキーマに定義されるフィールドの多くは、わざわざカラムに持つ必要の無いものです．
-そこで、NSManagedObjectのデータは一つのNSDictionary(JSON)として持ち、INDEXの用途にのみattributeを定義する方法を紹介します．
+そこで、`NSManagedObject`のデータは一つの`NSDictionary`(JSON)として持ち、INDEXの用途にのみattributeを定義する方法を紹介します．
 
 ```objective-c
 #import "NSManagedObject+json.h"
@@ -126,8 +126,8 @@ NSDictionary *json = @{
 [obj updateByJSON:json];
 ```
 
-こうすることで、SchemalessModelがprop1やsubdoc__prop2というattributeを持っていた場合、そこに@"hoge"と@"fuga"をマッピングしてくれます．ただし、次に述べるように、マッピングはしなくても利用することが出来ます．attributeにする場合は、その値で検索やソートをしたい場合に限って下さい．
-またdata(デフォルト．変更化)というattributeにupdateByJSONに渡したjsonそのものを格納しておいてくれます．
+こうすることで、`SchemalessModel`が`prop1`や`subdoc__prop2`というattributeを持っていた場合、そこに`@"hoge"`と`@"fuga"`をマッピングしてくれます．ただし、次に述べるように、マッピングはしなくても利用することが出来ます．attributeにする場合は、その値で検索やソートをしたい場合に限って下さい．
+また`data`(デフォルト．変更化)というattributeに`updateByJSON`に渡した`json`そのものを格納しておいてくれます．
 
 これを利用するのは次のようなイメージです．
 
