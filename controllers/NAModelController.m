@@ -16,6 +16,7 @@ NSString * const NAModelControllerInitializedNotification = @"NAModelControllerI
 - (id)init{
     self = [super init];
     if(self){
+        self.managedObjectClasses = [[NSMutableSet alloc] init];
         self.bundle = [NSBundle mainBundle];
         if([self name]){
             [self setup];
@@ -91,5 +92,46 @@ NSString * const NAModelControllerInitializedNotification = @"NAModelControllerI
     }
 }
 
+static NSMutableDictionary *__namodel_controllers__ = nil;
+static NSMutableDictionary *__class_reference__ = nil;
+
++ (void)load{
+    [super load];
+    
+	static dispatch_once_t onceToken;
+	dispatch_once(&onceToken, ^{
+        __namodel_controllers__ = [@{} mutableCopy];
+        __class_reference__ = [@{} mutableCopy];
+	});
+}
+
++ (NAModelController *)_createControllerByName:(NSString *)name bundle:(NSBundle *)bundle{
+    NAModelController *controller = [[[self class] alloc] init];
+    controller.name = name;
+    controller.bundle = bundle;
+    [controller setup];
+    return controller;
+}
+
++ (NAModelController *)createControllerByName:(NSString *)name bundle:(NSBundle *)bundle{
+    NAModelController *controller = [self _createControllerByName:name bundle:bundle];
+    __namodel_controllers__[name] = controller;
+    return controller;
+}
+
++ (NAModelController *)getControllerByName:(NSString *)name{
+    return __namodel_controllers__[name];
+}
+
++ (NAModelController *)getControllerByClass:(Class)kls{
+    return __class_reference__[NSStringFromClass(kls)];
+}
+
+- (void)addManagedObjectClasses:(NSArray *)klss{
+    [[self managedObjectClasses] addObjectsFromArray:klss];
+    for (Class kls in klss) {
+        __class_reference__[NSStringFromClass(kls)] = self;
+    }
+}
 
 @end

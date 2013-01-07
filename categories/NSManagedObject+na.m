@@ -14,6 +14,8 @@
 
 #import <objc/runtime.h>
 
+#import "NAModelController.h"
+
 @implementation NSManagedObject (na)
 
 + (NSPersistentStoreCoordinator *)coordinator{
@@ -25,7 +27,12 @@
 static NSManagedObjectContext * __main_context__ = nil;
 
 + (NSManagedObjectContext *)mainContext{
-    return __main_context__;
+    if(__main_context__)
+        return __main_context__;
+    NAModelController *controller = [NAModelController getControllerByClass:self];
+    if(controller)
+        return controller.mainContext;
+    return nil;
 }
 
 + (void)setMainContext:(NSManagedObjectContext *)context{

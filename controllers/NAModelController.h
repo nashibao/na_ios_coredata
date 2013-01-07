@@ -34,6 +34,8 @@ extern NSString * const NAModelControllerInitializedNotification;
 @property (strong, nonatomic) NSString *name;
 @property (strong, nonatomic) NSBundle *bundle;
 
+@property (strong, nonatomic) NSMutableSet *managedObjectClasses;
+
 /** setup
  */
 - (void)setup;
@@ -47,5 +49,12 @@ extern NSString * const NAModelControllerInitializedNotification;
  migrations
  */
 //- (void)migrate:(NSString *)newpath newversion:(NSInteger)newversion;
+
+// わざわざ継承しなくても済むようにしたい
++ (NAModelController *)createControllerByName:(NSString *)name bundle:(NSBundle *)bundle;
++ (NAModelController *)getControllerByName:(NSString *)name;
++ (NAModelController *)getControllerByClass:(Class)kls;
+
+- (void)addManagedObjectClasses:(NSArray *)objects;
 
 @end
