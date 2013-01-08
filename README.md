@@ -100,6 +100,8 @@ NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcur
 
 # 設定方法
 
+まず、pchファイルなどで`na_ios_async.h`をimportして下さい．
+
 `hoge.modeld`の中に`TestObject`と`TestObject2`が入っている場合、AppDelegateなどで、次のように書いて下さい．
 
 ```objective-c
@@ -107,7 +109,7 @@ NAModelController *controller = [NAModelController createControllerByName:@"hoge
 [controller addManagedObjectClasses:@[[TestObject class], [TestObject2 class]]];
 ```
 
-これで晴れて`na_ios/coredata`の全ての機能を使う事が出来ます．
+これで晴れて`na_ios_coredata`の全ての機能を使う事が出来ます．
 
 # スキーマレス・コアデータのススメ
 
