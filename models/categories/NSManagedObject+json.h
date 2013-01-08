@@ -28,7 +28,7 @@
 + (BOOL)enableAutoMapping;
 
 // マッピングAPI
-- (void)updateByJSON:(id)json;
+- (void)updateByJSON:(NSDictionary *)json;
 
 // jsonをまるまる突っ込む
 + (NSString *)data_for_key;

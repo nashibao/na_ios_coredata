@@ -14,7 +14,7 @@
     return YES;
 }
 
-- (void)updateByJSON:(id)json{
+- (void)updateByJSON:(NSDictionary *)json{
     if([[self class] enableAutoMapping]){
         for(NSString *attribute in [[self entity] attributesByName]){
             NSString *dotattribute = [attribute stringByReplacingOccurrencesOfString:@"__" withString:@"."];

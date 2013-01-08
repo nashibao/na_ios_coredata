@@ -18,14 +18,15 @@
 + (id)get:(NSDictionary *)props options:(NSDictionary *)options;
 + (id)create:(NSDictionary *)props options:(NSDictionary *)options;
 + (id)get_or_create:(NSDictionary *)props options:(NSDictionary *)options;
++ (id)get_or_create:(NSDictionary *)props update:(NSDictionary *)update options:(NSDictionary *)options;
 + (id)objectWithID:(NSManagedObjectID *)objectID;
-
 
 #warning !! completeハンドラで返す値はmain threadで扱えない．NSManagedObjectIDの列に修正すべき！
 + (void)filter:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(NSArray *mos))complete;
 + (void)get:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(id mo))complete;
 + (void)create:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(id mo))complete;
 + (void)get_or_create:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(id mo))complete;
++ (void)get_or_create:(NSDictionary *)props update:(NSDictionary *)update options:(NSDictionary *)options complete:(void(^)(id mo))complete;
 
 + (void)delete_all;
 
