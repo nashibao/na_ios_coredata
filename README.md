@@ -13,7 +13,7 @@
 ```
 
 このように非同期メソッドの`complete`ハンドラに結果が渡されます．また`complete`ハンドラはmain threadで返ってくるため、ハンドラ内でUIの処理をしても、問題が無いようになっています．
-非同期メソッドには`filter`の他に、`create`、`get`、`get_ore_create`などのAPIがあります．
+非同期メソッドには`filter`の他に、`create`、`get`、`get_or_create`、`bulk_create`、`bulk_get_or_create`などのAPIがあります．
 
 ```objective-c
 [TestObject create:@{@"name": @"test2"} options:nil complete:^(id mo) {
@@ -23,6 +23,11 @@
 [TestObject get_or_create:@{@"name": @"test"} options:nil complete:^(id mo) {
 	// hogehoge
 }];
+
+[TestObject bulk_get_or_create:@[@{@"name": @"test"}, @{@"name": @"test2"} ] options:nil complete:^(id mo) {
+	// hogehoge
+}];
+
 ```
 
 `create`や`get_or_create`はcontextに変更を加える可能性がありますが、その場合は、`TestObject`に登録した`mainContext`(main thread上のcontext)に変更がマージされてから`complete`ハンドラは呼ばれます．そのため、`complete`ハンドラ内でUIを更新すると、変更分も表示されることになります．
@@ -35,6 +40,27 @@ NSArray *objs = [TestObject filter:@{@"name": @"test"} options:nil];
 TestObject *obj2 = [TestObject get_or_create:@{@"name": @"test"} options:nil];
 Bool bl = (obj == obj2); => YES
 ```
+
+また`get_or_create`では取ってきたデータに対してアップデートをすることが出来ます. セレクトに使う`eqKeys`とアップデートに使う`upKeys`をそれぞれ設定して下さい．
+
+```objective-c
+
+NSDictionary *json = @[@{@"name": @"test", @"hoge": @"hogehoge", @"subdoc": @{@"fuga": @"fugafuga"}}, @{@"name": @"test2"}];
+
+[TestParent bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge", @"subdoc__fuga"] options:nil complete:^(NSArray *mos) {
+    TestParent *mo = mos[0];
+    //        create
+    STAssertTrue([mo.name isEqualToString:@"test"], nil);
+    //        update
+    STAssertTrue([mo.hoge isEqualToString:@"hogehoge"], nil);
+    //        スキーマレス
+    STAssertTrue([mo.data[@"hogehoge"] isEqualToString:@"hoge3"], nil);
+    //        dot syntax
+    STAssertTrue([mo.subdoc__fuga isEqualToString:@"fugafuga"], nil);
+    STAsynchronousTestDone(getorcreateasyncupdate2);
+}];
+```
+スキーマレスやサブドキュメント`@"subdoc__fuga"`については`スキーマレス・コアデータのススメ`を読んで下さい．
 
 最後に、独自にcoredata上でスレッドを作成したい上級者向けには、次のようなメソッドがあります．
 
@@ -85,22 +111,10 @@ NAModelController *controller = [NAModelController createControllerByName:@"hoge
 
 これで晴れて`na_ios/coredata`の全ての機能を使う事が出来ます．
 
-# `magicalpanda/MagicalRecord`との比較
-
-同じような目的のモジュールに、[magicalpanda/MagicalRecord](https://github.com/magicalpanda/MagicalRecord)があります．`magicalpanda/MagicalRecord`の“Performing Core Data operations on Threads“の章も合わせて参照して下さい．
-
-`magicalpanda/MagicalRecord`では、filteringやsortingにメリットがあります．`na_ios/coredata`に含まれていないような複雑なフェッチを行うことができます．
-これに対して、`na_ios/coredata`では複雑なfilteringやsortingを介するフェッチには`NSFetchedResultsController`経由で行い、`NSArray`を介さない方法を推奨しています．これは、`UITableViewController`などと併用する場合、パフォーマンスとメモリの観点において都合が良いからです．
-
-`NSFetchedResultsController`と`UITableViewController`を`na_ios/coredata`で使うには`na_ios/coredata_ui`を参照して下さい．
-
-`na_ios/coredata`ではフェッチに自由度がない代わりに、フェッチやインサートに非同期のメソッドを持っています．これらを使う事でUIのブロックを防ぐことを念頭におきつつ、複雑なスレッドプログラミングを隠蔽することを目的にしています．
-
-`magicalpanda/MagicalRecord`も分かりやすいAPIを持ったすばらしいモジュールです．上記の比較事項を念頭に入れて、プログラマはどちらのライブラリを選ぶかを選択することができます．
-
 # スキーマレス・コアデータのススメ
 
-`na_ios/coredata`では、次の理由から、スキーマレスな`NSManagedObject`を推奨しています．
+(以下の設定は、`na_ios/coredata`のAPIではデフォルトで有効です．)
+`na_ios/coredata`では、次の理由から、スキーマレスな`NSManagedObject`を標準で採用しています．
 
  1. スキーマ変更によるアップデート時のmigration
  2. サーバサイドのスキーマ変更への追従
@@ -140,10 +154,24 @@ or
 
 このようにすることで、マイグレーションのコストを押さえるのに加えて、数多くのフィールドを削減して、コードをクリーンに保つことが出来るでしょう．
 
+# `magicalpanda/MagicalRecord`との比較
+
+同じような目的のモジュールに、[magicalpanda/MagicalRecord](https://github.com/magicalpanda/MagicalRecord)があります．`magicalpanda/MagicalRecord`の“Performing Core Data operations on Threads“の章も合わせて参照して下さい．
+
+`magicalpanda/MagicalRecord`では、filteringやsortingにメリットがあります．`na_ios/coredata`に含まれていないような複雑なフェッチを行うことができます．
+これに対して、`na_ios/coredata`では複雑なfilteringやsortingを介するフェッチには`NSFetchedResultsController`経由で行い、`NSArray`を介さない方法を推奨しています．これは、`UITableViewController`などと併用する場合、パフォーマンスとメモリの観点において都合が良いからです．
+
+`NSFetchedResultsController`と`UITableViewController`を`na_ios/coredata`で使うには`na_ios/coredata_ui`を参照して下さい．
+
+`na_ios/coredata`ではフェッチに自由度がない代わりに、フェッチやインサートに非同期のメソッドを持っています．これらを使う事でUIのブロックを防ぐことを念頭におきつつ、複雑なスレッドプログラミングを隠蔽することを目的にしています．
+
+`magicalpanda/MagicalRecord`も分かりやすいAPIを持ったすばらしいモジュールです．上記の比較事項を念頭に入れて、プログラマはどちらのライブラリを選ぶかを選択することができます．
+
+
 # 依存関係
 
 依存元：**なし**  
-依存先: **na_ios/coredata_ui**, **na_ios/coredata_sync**
+依存先: **na_coredata_table**, **na_coredata_sync**
 
 
 # 補足情報 個々のパッケージ
