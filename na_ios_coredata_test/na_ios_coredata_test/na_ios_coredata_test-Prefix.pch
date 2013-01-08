@@ -1,0 +1,18 @@
+//
+// Prefix header for all source files of the 'na_ios_coredata_test' target in the 'na_ios_coredata_test' project
+//
+
+#import <Availability.h>
+
+#ifndef __IPHONE_3_0
+#warning "This project uses features only available in iOS SDK 3.0 and later."
+#endif
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+#import <BlocksKit/BlocksKit.h>
+#import "na_ios_categories_general.h"
+#import "na_ios_macros_general.h"
+#import "na_ios_async.h"
+#endif
