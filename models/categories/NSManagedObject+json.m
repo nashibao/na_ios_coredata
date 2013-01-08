@@ -15,16 +15,25 @@
 }
 
 - (void)updateByJSON:(NSDictionary *)json{
+    if(!json)
+        return;
+    BOOL has_data_key = NO;
     if([[self class] enableAutoMapping]){
         for(NSString *attribute in [[self entity] attributesByName]){
+            if([attribute isEqualToString:[[self class] data_for_key]]){
+                has_data_key = YES;
+            }
             NSString *dotattribute = [attribute stringByReplacingOccurrencesOfString:@"__" withString:@"."];
             id value = [json valueForKeyPath:dotattribute];
-            if(isnull(value))
-                continue;
+            if(isnull(value)){
+                value = [json valueForKeyPath:attribute];
+                if(isnull(value))
+                    continue;
+            }
             [self setValue:value forKeyPath:attribute];
         }
     }
-    if([[self class] data_for_key]){
+    if(has_data_key){
         [self setValue:json forKey:[[self class] data_for_key]];
     }
 }
