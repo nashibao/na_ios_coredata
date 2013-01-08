@@ -44,23 +44,21 @@ Bool bl = (obj == obj2); => YES
 また`get_or_create`では取ってきたデータに対してアップデートをすることが出来ます. セレクトに使う`eqKeys`とアップデートに使う`upKeys`をそれぞれ設定して下さい．
 
 ```objective-c
-
 NSDictionary *json = @[@{@"name": @"test", @"hoge": @"hogehoge", @"subdoc": @{@"fuga": @"fugafuga"}}, @{@"name": @"test2"}];
 
-[TestParent bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge", @"subdoc__fuga"] options:nil complete:^(NSArray *mos) {
-    TestParent *mo = mos[0];
+[TestObject bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge", @"subdoc__fuga"] options:nil complete:^(NSArray *mos) {
+    TestObject *obj = mos[0];
     //        create
-    STAssertTrue([mo.name isEqualToString:@"test"], nil);
+    STAssertTrue([obj.name isEqualToString:@"test"], nil);
     //        update
-    STAssertTrue([mo.hoge isEqualToString:@"hogehoge"], nil);
+    STAssertTrue([obj.hoge isEqualToString:@"hogehoge"], nil);
     //        スキーマレス
-    STAssertTrue([mo.data[@"hogehoge"] isEqualToString:@"hoge3"], nil);
+    STAssertTrue([obj.data[@"hoge"] isEqualToString:@"hogehoge"], nil);
     //        dot syntax
-    STAssertTrue([mo.subdoc__fuga isEqualToString:@"fugafuga"], nil);
-    STAsynchronousTestDone(getorcreateasyncupdate2);
+    STAssertTrue([obj.subdoc__fuga isEqualToString:@"fugafuga"], nil);
 }];
 ```
-スキーマレスやサブドキュメント`@"subdoc__fuga"`については`スキーマレス・コアデータのススメ`を読んで下さい．
+スキーマレスやサブドキュメントアクセス`@"subdoc__fuga"`については`スキーマレス・コアデータのススメ`を読んで下さい．
 
 最後に、独自にcoredata上でスレッドを作成したい上級者向けには、次のようなメソッドがあります．
 
