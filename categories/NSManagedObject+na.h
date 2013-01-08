@@ -19,6 +19,8 @@
 + (id)create:(NSDictionary *)props options:(NSDictionary *)options;
 + (id)get_or_create:(NSDictionary *)props options:(NSDictionary *)options;
 + (id)get_or_create:(NSDictionary *)props update:(NSDictionary *)update options:(NSDictionary *)options;
++ (NSArray *)bulk_create:(NSArray *)json options:(NSDictionary *)options;
++ (NSArray *)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys options:(NSDictionary *)options;
 + (id)objectWithID:(NSManagedObjectID *)objectID;
 
 #warning !! completeハンドラで返す値はmain threadで扱えない．NSManagedObjectIDの列に修正すべき！
@@ -27,6 +29,8 @@
 + (void)create:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(id mo))complete;
 + (void)get_or_create:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(id mo))complete;
 + (void)get_or_create:(NSDictionary *)props update:(NSDictionary *)update options:(NSDictionary *)options complete:(void(^)(id mo))complete;
++ (void)bulk_create:(NSArray *)json options:(NSDictionary *)options complete:(void(^)(NSArray * mos))complete;
++ (void)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys options:(NSDictionary *)options complete:(void(^)(NSArray * mos))complete;
 
 + (void)delete_all;
 

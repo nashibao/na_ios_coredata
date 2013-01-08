@@ -10,6 +10,12 @@
 
 #import "NSPredicate+na.h"
 
+#import "NSManagedObject+json.h"
+
+@implementation NSManagedObjectContextGetOrCreateDictionary
+@end
+
+
 @implementation NSManagedObjectContext (na)
 
 - (NSArray *)filterObjects:(NSString *)entityName props:(NSDictionary *)props{
@@ -71,11 +77,80 @@
     return obj;
 }
 
-- (NSManagedObject *)getOrCreateObject:(NSString *)entityName props:(NSDictionary *)props{
+//dictionaryからkeyの部分だけ取り出す関数
+- (NSDictionary *)_props:(NSDictionary *)json keys:(NSArray *)keys{
+    NSMutableDictionary *dic = [@{} mutableCopy];
+    for(NSString *attribute in keys){
+        NSString *dotattribute = [attribute stringByReplacingOccurrencesOfString:@"__" withString:@"."];
+        id value = [json valueForKeyPath:dotattribute];
+        if(isnull(value))
+            continue;
+        dic[attribute] = value;
+    }
+    return dic;
+}
+
+- (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName props:(NSDictionary *)props{
+    return [self getOrCreateObject:entityName props:props update:nil];
+}
+
+- (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName props:(NSDictionary *)props update:(NSDictionary *)update{
+    NSManagedObjectContextGetOrCreateDictionary *dic = [[NSManagedObjectContextGetOrCreateDictionary alloc] init];
     NSManagedObject *obj = [self getObject:entityName props:props];
-    if(obj)return obj;
-    obj = [self createObject:entityName props:props];
-    return obj;
+    if(!obj){
+        obj = [self createObject:entityName props:props];
+    }
+    [obj updateByJSON:update];
+    dic.object = obj;
+    dic.is_created = NO;
+    return dic;
+}
+
+- (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName allProps:(NSDictionary *)allProps eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys{
+    NSDictionary *props = [self _props:allProps keys:eqKeys];
+    NSDictionary *update = [self _props:allProps keys:upKeys];
+    return [self getOrCreateObject:entityName props:props update:update];
+}
+
+#pragma mark bulk操作
+
+- (NSArray *)bulkCreateObjects:(NSString *)entityName props:(NSArray *)propss{
+    NSMutableArray *result = [@[] mutableCopy];
+    for(NSDictionary *props in propss){
+        NSManagedObject *obj = [self createObject:entityName props:props];
+        [result addObject:obj];
+    }
+    return result;
+}
+
+- (NSArray *)bulkGetOrCreateObjects:(NSString *)entityName props:(NSArray *)propss updates:(NSArray *)updates{
+    if(updates && propss)
+        if([updates count] != [propss count])
+            return nil;
+    NSMutableArray *result = [@[] mutableCopy];
+    int cnt = 0;
+    for(NSDictionary *props in propss){
+        NSDictionary *update = nil;
+        if(updates)
+            update = updates[cnt];
+        NSManagedObjectContextGetOrCreateDictionary *dic = [self getOrCreateObject:entityName props:props update:update];
+        NSManagedObject *obj = dic.object;
+        [result addObject:obj];
+        cnt += 1;
+    }
+    return result;
+}
+
+- (NSArray *)bulkGetOrCreateObjects:(NSString *)entityName allProps:(NSArray *)allPropss eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys{
+    NSMutableArray *result = [@[] mutableCopy];
+    for(NSDictionary *allProps in allPropss){
+        NSDictionary *props = [self _props:allProps keys:eqKeys];
+        NSDictionary *update = [self _props:allProps keys:upKeys];
+        NSManagedObjectContextGetOrCreateDictionary *dic = [self getOrCreateObject:entityName props:props update:update];
+        NSManagedObject *obj = dic.object;
+        [result addObject:obj];
+    }
+    return result;
 }
 
 #pragma mark delete
