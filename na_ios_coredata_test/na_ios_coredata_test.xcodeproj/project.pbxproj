@@ -46,21 +46,10 @@
 		3478B2FD169BF7E300DDF9DB /* NSNotificationCenter+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2E3169BF7E300DDF9DB /* NSNotificationCenter+na.m */; };
 		3478B2FE169BF7E300DDF9DB /* NSNull+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2E5169BF7E300DDF9DB /* NSNull+na.m */; };
 		3478B2FF169BF7E300DDF9DB /* NSNull+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2E5169BF7E300DDF9DB /* NSNull+na.m */; };
-		3478B300169BF7E300DDF9DB /* UIActionSheet+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2EA169BF7E300DDF9DB /* UIActionSheet+na.m */; };
-		3478B301169BF7E300DDF9DB /* UIActionSheet+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2EA169BF7E300DDF9DB /* UIActionSheet+na.m */; };
-		3478B302169BF7E300DDF9DB /* UINavigationController+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2EC169BF7E300DDF9DB /* UINavigationController+na.m */; };
-		3478B303169BF7E300DDF9DB /* UINavigationController+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2EC169BF7E300DDF9DB /* UINavigationController+na.m */; };
-		3478B304169BF7E300DDF9DB /* UITableView+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2EE169BF7E300DDF9DB /* UITableView+na.m */; };
-		3478B305169BF7E300DDF9DB /* UITableView+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2EE169BF7E300DDF9DB /* UITableView+na.m */; };
-		3478B306169BF7E300DDF9DB /* UIView+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2F0169BF7E300DDF9DB /* UIView+na.m */; };
-		3478B307169BF7E300DDF9DB /* UIView+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2F0169BF7E300DDF9DB /* UIView+na.m */; };
-		3478B308169BF7E300DDF9DB /* UIViewController+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2F2169BF7E300DDF9DB /* UIViewController+na.m */; };
-		3478B309169BF7E300DDF9DB /* UIViewController+na.m in Sources */ = {isa = PBXBuildFile; fileRef = 3478B2F2169BF7E300DDF9DB /* UIViewController+na.m */; };
 		347C4EE0169C02DE00466605 /* NSManagedObjectContextNaCategoryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 347C4ED9169C02DE00466605 /* NSManagedObjectContextNaCategoryTest.m */; };
 		347C4EE1169C02DE00466605 /* TestChild.m in Sources */ = {isa = PBXBuildFile; fileRef = 347C4EDB169C02DE00466605 /* TestChild.m */; };
 		347C4EE2169C02DE00466605 /* testmodel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 347C4EDC169C02DE00466605 /* testmodel.xcdatamodeld */; };
 		347C4EEC169C075D00466605 /* TestParent.m in Sources */ = {isa = PBXBuildFile; fileRef = 347C4EEB169C075C00466605 /* TestParent.m */; };
-		EAD9F7E5919B4E3283E4ECAB /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 34030483411C4E29A56F1DBC /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,7 +63,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		34030483411C4E29A56F1DBC /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		3478B227169BF6E400DDF9DB /* na_ios_coredata_test.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = na_ios_coredata_test.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3478B22B169BF6E400DDF9DB /* UIKit.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		3478B22D169BF6E400DDF9DB /* Foundation.framework */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -118,16 +106,6 @@
 		3478B2E5169BF7E300DDF9DB /* NSNull+na.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSNull+na.m"; sourceTree = "<group>"; };
 		3478B2E6169BF7E300DDF9DB /* na_ios_categories_general.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = na_ios_categories_general.h; sourceTree = "<group>"; };
 		3478B2E7169BF7E300DDF9DB /* na_ios_categories_ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = na_ios_categories_ui.h; sourceTree = "<group>"; };
-		3478B2E9169BF7E300DDF9DB /* UIActionSheet+na.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIActionSheet+na.h"; sourceTree = "<group>"; };
-		3478B2EA169BF7E300DDF9DB /* UIActionSheet+na.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIActionSheet+na.m"; sourceTree = "<group>"; };
-		3478B2EB169BF7E300DDF9DB /* UINavigationController+na.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UINavigationController+na.h"; sourceTree = "<group>"; };
-		3478B2EC169BF7E300DDF9DB /* UINavigationController+na.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UINavigationController+na.m"; sourceTree = "<group>"; };
-		3478B2ED169BF7E300DDF9DB /* UITableView+na.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UITableView+na.h"; sourceTree = "<group>"; };
-		3478B2EE169BF7E300DDF9DB /* UITableView+na.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UITableView+na.m"; sourceTree = "<group>"; };
-		3478B2EF169BF7E300DDF9DB /* UIView+na.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+na.h"; sourceTree = "<group>"; };
-		3478B2F0169BF7E300DDF9DB /* UIView+na.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+na.m"; sourceTree = "<group>"; };
-		3478B2F1169BF7E300DDF9DB /* UIViewController+na.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIViewController+na.h"; sourceTree = "<group>"; };
-		3478B2F2169BF7E300DDF9DB /* UIViewController+na.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIViewController+na.m"; sourceTree = "<group>"; };
 		3478B2F4169BF7E300DDF9DB /* na_ios_async.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = na_ios_async.h; sourceTree = "<group>"; };
 		3478B2F5169BF7E300DDF9DB /* na_ios_macros_general.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = na_ios_macros_general.h; sourceTree = "<group>"; };
 		3478B2F6169BF7E300DDF9DB /* na_ios_macros_ui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = na_ios_macros_ui.h; sourceTree = "<group>"; };
@@ -138,7 +116,6 @@
 		347C4EDD169C02DE00466605 /* testmodel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = testmodel.xcdatamodel; sourceTree = "<group>"; };
 		347C4EEA169C075C00466605 /* TestParent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestParent.h; sourceTree = "<group>"; };
 		347C4EEB169C075C00466605 /* TestParent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestParent.m; sourceTree = "<group>"; };
-		9016BF4D78FD45FA87C72C7D /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -150,7 +127,6 @@
 				3478B22C169BF6E400DDF9DB /* UIKit.framework in Frameworks */,
 				3478B22E169BF6E400DDF9DB /* Foundation.framework in Frameworks */,
 				3478B230169BF6E400DDF9DB /* CoreGraphics.framework in Frameworks */,
-				EAD9F7E5919B4E3283E4ECAB /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -176,7 +152,6 @@
 				3478B24F169BF6E400DDF9DB /* na_ios_coredata_testTests */,
 				3478B22A169BF6E400DDF9DB /* Frameworks */,
 				3478B228169BF6E400DDF9DB /* Products */,
-				9016BF4D78FD45FA87C72C7D /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -197,7 +172,6 @@
 				3478B22D169BF6E400DDF9DB /* Foundation.framework */,
 				3478B22F169BF6E400DDF9DB /* CoreGraphics.framework */,
 				3478B249169BF6E400DDF9DB /* SenTestingKit.framework */,
-				34030483411C4E29A56F1DBC /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -326,7 +300,6 @@
 				3478B2DF169BF7E300DDF9DB /* general */,
 				3478B2E6169BF7E300DDF9DB /* na_ios_categories_general.h */,
 				3478B2E7169BF7E300DDF9DB /* na_ios_categories_ui.h */,
-				3478B2E8169BF7E300DDF9DB /* ui */,
 			);
 			path = categories;
 			sourceTree = "<group>";
@@ -342,23 +315,6 @@
 				3478B2E5169BF7E300DDF9DB /* NSNull+na.m */,
 			);
 			path = general;
-			sourceTree = "<group>";
-		};
-		3478B2E8169BF7E300DDF9DB /* ui */ = {
-			isa = PBXGroup;
-			children = (
-				3478B2E9169BF7E300DDF9DB /* UIActionSheet+na.h */,
-				3478B2EA169BF7E300DDF9DB /* UIActionSheet+na.m */,
-				3478B2EB169BF7E300DDF9DB /* UINavigationController+na.h */,
-				3478B2EC169BF7E300DDF9DB /* UINavigationController+na.m */,
-				3478B2ED169BF7E300DDF9DB /* UITableView+na.h */,
-				3478B2EE169BF7E300DDF9DB /* UITableView+na.m */,
-				3478B2EF169BF7E300DDF9DB /* UIView+na.h */,
-				3478B2F0169BF7E300DDF9DB /* UIView+na.m */,
-				3478B2F1169BF7E300DDF9DB /* UIViewController+na.h */,
-				3478B2F2169BF7E300DDF9DB /* UIViewController+na.m */,
-			);
-			path = ui;
 			sourceTree = "<group>";
 		};
 		3478B2F3169BF7E300DDF9DB /* macro */ = {
@@ -381,7 +337,6 @@
 				3478B223169BF6E400DDF9DB /* Sources */,
 				3478B224169BF6E400DDF9DB /* Frameworks */,
 				3478B225169BF6E400DDF9DB /* Resources */,
-				B8056B6D1FA243C69A9F2E0A /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -474,20 +429,6 @@
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
 		};
-		B8056B6D1FA243C69A9F2E0A /* Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -509,11 +450,6 @@
 				3478B2FA169BF7E300DDF9DB /* NSDate+na.m in Sources */,
 				3478B2FC169BF7E300DDF9DB /* NSNotificationCenter+na.m in Sources */,
 				3478B2FE169BF7E300DDF9DB /* NSNull+na.m in Sources */,
-				3478B300169BF7E300DDF9DB /* UIActionSheet+na.m in Sources */,
-				3478B302169BF7E300DDF9DB /* UINavigationController+na.m in Sources */,
-				3478B304169BF7E300DDF9DB /* UITableView+na.m in Sources */,
-				3478B306169BF7E300DDF9DB /* UIView+na.m in Sources */,
-				3478B308169BF7E300DDF9DB /* UIViewController+na.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -533,11 +469,6 @@
 				3478B2FB169BF7E300DDF9DB /* NSDate+na.m in Sources */,
 				3478B2FD169BF7E300DDF9DB /* NSNotificationCenter+na.m in Sources */,
 				3478B2FF169BF7E300DDF9DB /* NSNull+na.m in Sources */,
-				3478B301169BF7E300DDF9DB /* UIActionSheet+na.m in Sources */,
-				3478B303169BF7E300DDF9DB /* UINavigationController+na.m in Sources */,
-				3478B305169BF7E300DDF9DB /* UITableView+na.m in Sources */,
-				3478B307169BF7E300DDF9DB /* UIView+na.m in Sources */,
-				3478B309169BF7E300DDF9DB /* UIViewController+na.m in Sources */,
 				347C4EE0169C02DE00466605 /* NSManagedObjectContextNaCategoryTest.m in Sources */,
 				347C4EE1169C02DE00466605 /* TestChild.m in Sources */,
 				347C4EE2169C02DE00466605 /* testmodel.xcdatamodeld in Sources */,
@@ -627,7 +558,6 @@
 		};
 		3478B25B169BF6E400DDF9DB /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9016BF4D78FD45FA87C72C7D /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "na_ios_coredata_test/na_ios_coredata_test-Prefix.pch";
@@ -639,7 +569,6 @@
 		};
 		3478B25C169BF6E400DDF9DB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9016BF4D78FD45FA87C72C7D /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "na_ios_coredata_test/na_ios_coredata_test-Prefix.pch";
@@ -651,7 +580,6 @@
 		};
 		3478B25E169BF6E400DDF9DB /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 9016BF4D78FD45FA87C72C7D /* Pods.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/na_ios_coredata_test.app/na_ios_coredata_test";
 				FRAMEWORK_SEARCH_PATHS = (

@@ -54,39 +54,39 @@
 {
     
     //    mo作成
-    TestParent *pa1 = [TestParent create:@{@"name": @"test"} options:nil];
+    TestParent *pa1 = [TestParent create:@{@"name": @"test"}];
     
     STAssertTrue([pa1 isKindOfClass:[TestParent class]], @"返り値はそれ自体");
     
-    NSArray *mos = [TestParent filter:nil options:nil];
+    NSArray *mos = [TestParent filter:nil];
     
     STAssertTrue([mos count] == 1, @"filter test");
     
     STAssertEqualObjects([mos objectAtIndex:0], pa1, @"同じコンテクストだから同じはず？");
     
-    TestParent *pa2 = [TestParent get:@{@"name": @"test"} options:nil];
+    TestParent *pa2 = [TestParent get:@{@"name": @"test"}];
     
     STAssertEqualObjects(pa1, pa2, @"get test");
     
-    TestParent *pa3 = [TestParent get_or_create:@{@"name": @"test"} options:nil];
+    TestParent *pa3 = [TestParent get_or_create:@{@"name": @"test"}];
     
     STAssertEqualObjects(pa3, pa1, @"unique制約");
     
-    TestParent *pa4 = [TestParent create:@{@"name": @"test2"} options:nil];
+    TestParent *pa4 = [TestParent create:@{@"name": @"test2"}];
     
     STAssertFalse(pa1 == pa4, @"create test");
     
-    mos = [TestParent filter:nil options:nil];
+    mos = [TestParent filter:nil];
     
     STAssertTrue([mos count] == 2, @"filter test");
     
-    mos = [TestParent filter:@{@"name": @"test"} options:nil];
+    mos = [TestParent filter:@{@"name": @"test"}];
     
     STAssertTrue([mos count] == 1, @"filter test");
     
     [TestParent delete_all];
     
-    mos = [TestParent filter:nil options:nil];
+    mos = [TestParent filter:nil];
     
     STAssertTrue([mos count] == 0, @"delete test");
 }
@@ -97,7 +97,7 @@
 {
     STAsynchronousTestStart(asynccreate);
     
-    [TestParent create:@{@"name": @"test"} options:nil complete:^(id mo) {
+    [TestParent create:@{@"name": @"test"} complete:^(id mo) {
         TestParent *pa = (TestParent *)mo;
         STAssertTrue([pa isKindOfClass:[TestParent class]], @"async create");
         STAssertTrue([@"test" isEqualToString:[pa name]], nil);
@@ -106,14 +106,14 @@
     
     STAsynchronousTestWait(asynccreate, 0.5);
     
-    [TestParent create:@{@"name": @"test2"} options:nil];
+    [TestParent create:@{@"name": @"test2"}];
     
     //    saveをしないとcontextがマージされない！！
     [TestParent save];
     
     STAsynchronousTestStart(asyncget);
     
-    [TestParent get:@{@"name": @"test"} options:nil complete:^(id mo) {
+    [TestParent get:@{@"name": @"test"} complete:^(id mo) {
         TestParent *pa = (TestParent *)mo;
         STAssertTrue([@"test" isEqualToString:[pa name]], nil);
         STAsynchronousTestDone(asyncget);
@@ -121,12 +121,12 @@
     
     STAsynchronousTestWait(asyncget, 0.5);
     
-    NSArray *mos = [TestParent filter:nil options:nil];
+    NSArray *mos = [TestParent filter:nil];
     STAssertTrue([mos count] == 2, nil);
     
     STAsynchronousTestStart(asyncfilter);
     
-    [TestParent filter:nil options:nil complete:^(NSArray *mos) {
+    [TestParent filter:nil complete:^(NSArray *mos) {
         NSLog(@"%s|%d", __PRETTY_FUNCTION__, [mos count]);
         STAssertTrue([mos count] == 2, nil);
         STAsynchronousTestDone(asyncfilter);
@@ -136,12 +136,12 @@
     
     STAsynchronousTestStart(asyncgetcreate);
     
-    [TestParent get_or_create:@{@"name": @"test"} options:nil complete:^(id mo) {
+    [TestParent get_or_create:@{@"name": @"test"} complete:^(id mo) {
         TestParent *pa1 = (TestParent *)mo;
-        NSArray *mos = [TestParent filter:nil options:nil];
+        NSArray *mos = [TestParent filter:nil];
         STAssertTrue([mos count] == 2, nil);
         
-        TestParent *pa = [TestParent get:@{@"name": @"test"} options:nil];
+        TestParent *pa = [TestParent get:@{@"name": @"test"}];
         TestParent *pa2 = (TestParent *)[[TestParent mainContext] objectWithID:pa1.objectID];
         STAssertTrue(pa == pa2, nil);
         STAsynchronousTestDone(asyncgetcreate);
@@ -151,8 +151,8 @@
     
     STAsynchronousTestStart(asynccreate2);
     
-    [TestParent get_or_create:@{@"name": @"test2"} options:nil complete:^(id mo) {
-        NSArray *mos = [TestParent filter:nil options:nil];
+    [TestParent get_or_create:@{@"name": @"test2"} complete:^(id mo) {
+        NSArray *mos = [TestParent filter:nil];
         STAssertTrue([mos count] == 2, nil);
         STAsynchronousTestDone(asynccreate2);
     }];
@@ -166,7 +166,7 @@
 {
     STAsynchronousTestStart(getorcreateasyncupdate);
     
-    [TestParent get_or_create:@{@"name": @"test3"} update:@{@"hoge": @"hoge1", @"subdoc": @{@"fuga": @"fuga1"}} options:nil complete:^(TestParent * mo) {
+    [TestParent get_or_create:@{@"name": @"test3"} update:@{@"hoge": @"hoge1", @"subdoc": @{@"fuga": @"fuga1"}} complete:^(TestParent * mo) {
         //        create
         STAssertTrue([mo.name isEqualToString:@"test3"], nil);
         //        update
@@ -186,13 +186,13 @@
 - (void)testBulk
 {
     
-    NSArray *mos = [TestParent filter:nil options:nil];
+    NSArray *mos = [TestParent filter:nil];
     int start = [mos count];
     
-//    bulk_create
+    //    bulk_create
     NSArray *json = @[@{@"name": @"test10"}, @{@"name": @"test11"}];
     
-    NSArray *objs = [TestParent bulk_create:json options:nil];
+    NSArray *objs = [TestParent bulk_create:json];
     STAssertTrue([objs count] == 2, @"2個");
     
     TestParent *pa1 = objs[0];
@@ -204,8 +204,8 @@
     
     json = @[@{@"name": @"test10", @"hoge": @"hoge1"}, @{@"name": @"test12"}];
     
-//    bulk_get_or_create
-    objs = [TestParent bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge"] options:nil];
+    //    bulk_get_or_create
+    objs = [TestParent bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge"]];
     pa1 = objs[0];
     
     STAssertTrue([pa1.hoge isEqualToString:@"hoge1"], @"update");
@@ -213,7 +213,7 @@
     
     STAssertTrue([pa2.name isEqualToString:@"test12"], @"名前");
     
-    mos = [TestParent filter:nil options:nil];
+    mos = [TestParent filter:nil];
     int end = [mos count];
     STAssertTrue(end-start==3, @"3つしか加わらないはず");
     
@@ -223,7 +223,7 @@
  */
 - (void)testBulkAsync
 {
-    NSArray *mos = [TestParent filter:nil options:nil];
+    NSArray *mos = [TestParent filter:nil];
     int start = [mos count];
     
     //    bulk_create
@@ -231,7 +231,7 @@
     
     NSArray *json = @[@{@"name": @"test13"}, @{@"name": @"test14"}];
     
-    [TestParent bulk_create:json options:nil complete:^(NSArray *mos) {
+    [TestParent bulk_create:json complete:^(NSArray *mos) {
         TestParent *pa1 = mos[0];
         
         STAssertTrue([pa1.name isEqualToString:@"test13"], @"名前");
@@ -243,12 +243,12 @@
     
     STAsynchronousTestWait(getorcreateasyncupdate, 0.5);
     
-//    bulk_get_or_create
+    //    bulk_get_or_create
     STAsynchronousTestStart(getorcreateasyncupdate2);
     
     json = @[@{@"name": @"test13", @"hoge": @"hoge3", @"subdoc": @{@"fuga": @"fuga3"}}, @{@"name": @"test15"}];
     
-    [TestParent bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge", @"subdoc__fuga"] options:nil complete:^(NSArray *mos) {
+    [TestParent bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge", @"subdoc__fuga"] complete:^(NSArray *mos) {
         TestParent *mo = mos[0];
         //        create
         STAssertTrue([mo.name isEqualToString:@"test13"], nil);
@@ -263,7 +263,7 @@
     
     STAsynchronousTestWait(getorcreateasyncupdate2, 0.5);
     
-    mos = [TestParent filter:nil options:nil];
+    mos = [TestParent filter:nil];
     int end = [mos count];
     
     STAssertTrue(end-start==3, @"3つしか加わらないはず");

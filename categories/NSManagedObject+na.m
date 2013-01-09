@@ -47,33 +47,33 @@ static NSManagedObjectContext * __main_context__ = nil;
     return context;
 }
 
-+ (NSArray *)filter:(NSDictionary *)props options:(NSDictionary *)options{
++ (NSArray *)filter:(NSDictionary *)props{
     return [[self mainContext] filterObjects:NSStringFromClass(self) props:props];
 }
 
-+ (id)get:(NSDictionary *)props options:(NSDictionary *)options{
++ (id)get:(NSDictionary *)props{
     return [[self mainContext] getObject:NSStringFromClass(self) props:props];
 }
 
-+ (id)create:(NSDictionary *)props options:(NSDictionary *)options{
++ (id)create:(NSDictionary *)props{
     return [[self mainContext] createObject:NSStringFromClass(self) props:props];
 }
 
-+ (id)get_or_create:(NSDictionary *)props options:(NSDictionary *)options{
-    return [self get_or_create:props update:nil options:options];
++ (id)get_or_create:(NSDictionary *)props{
+    return [self get_or_create:props update:nil];
 }
 
-+ (id)get_or_create:(NSDictionary *)props update:(NSDictionary *)update options:(NSDictionary *)options{
++ (id)get_or_create:(NSDictionary *)props update:(NSDictionary *)update{
     NSManagedObjectContextGetOrCreateDictionary *dic = [[self mainContext] getOrCreateObject:NSStringFromClass(self) props:props update:update];
     NSManagedObject *obj = dic.object;
     return obj;
 }
 
-+ (NSArray *)bulk_create:(NSArray *)json options:(NSDictionary *)options{
++ (NSArray *)bulk_create:(NSArray *)json{
     return [[self mainContext] bulkCreateObjects:NSStringFromClass(self) props:json];
 }
 
-+ (NSArray *)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys options:(NSDictionary *)options{
++ (NSArray *)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys{
     return [[self mainContext] bulkGetOrCreateObjects:NSStringFromClass(self) allProps:json eqKeys:eqKeys upKeys:upKeys];
 }
 
@@ -81,7 +81,7 @@ static NSManagedObjectContext * __main_context__ = nil;
     return [[self mainContext] objectWithID:objectID];
 }
 
-+ (void)filter:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(NSArray *mos))complete{
++ (void)filter:(NSDictionary *)props complete:(void(^)(NSArray *mos))complete{
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         NSArray *mos = [context filterObjects:NSStringFromClass(self) props:props];
         if(complete)
@@ -91,17 +91,17 @@ static NSManagedObjectContext * __main_context__ = nil;
     } afterSaveOnMainThread:nil];
 }
 
-+ (void)get:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(id mo))complete{
++ (void)get:(NSDictionary *)props complete:(void(^)(id mo))complete{
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         id mo = [context getObject:NSStringFromClass(self) props:props];
         if(complete)
-        dispatch_async(dispatch_get_main_queue(), ^{
-            complete(mo);
-        });
+            dispatch_async(dispatch_get_main_queue(), ^{
+                complete(mo);
+            });
     } afterSaveOnMainThread:nil];
 }
 
-+ (void)create:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(id mo))complete{
++ (void)create:(NSDictionary *)props complete:(void(^)(id mo))complete{
     __block id mo = nil;
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         mo = [context createObject:NSStringFromClass(self) props:props];
@@ -112,11 +112,11 @@ static NSManagedObjectContext * __main_context__ = nil;
     }];
 }
 
-+ (void)get_or_create:(NSDictionary *)props options:(NSDictionary *)options complete:(void(^)(id mo))complete{
-    [self get_or_create:props update:nil options:options complete:complete];
++ (void)get_or_create:(NSDictionary *)props complete:(void(^)(id mo))complete{
+    [self get_or_create:props update:nil complete:complete];
 }
 
-+ (void)get_or_create:(NSDictionary *)props update:(NSDictionary *)update options:(NSDictionary *)options complete:(void (^)(id))complete{
++ (void)get_or_create:(NSDictionary *)props update:(NSDictionary *)update complete:(void (^)(id))complete{
     __block id mo = nil;
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         NSManagedObjectContextGetOrCreateDictionary *dic = [context getOrCreateObject:NSStringFromClass(self) props:props update:update];
@@ -135,7 +135,7 @@ static NSManagedObjectContext * __main_context__ = nil;
     }];
 }
 
-+ (void)bulk_create:(NSArray *)json options:(NSDictionary *)options complete:(void (^)(NSArray * mos))complete{
++ (void)bulk_create:(NSArray *)json complete:(void (^)(NSArray * mos))complete{
     __block NSArray *mos = nil;
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         mos = [context bulkCreateObjects:NSStringFromClass(self) props:json];
@@ -146,7 +146,7 @@ static NSManagedObjectContext * __main_context__ = nil;
     }];
 }
 
-+ (void)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys options:(NSDictionary *)options complete:(void (^)(NSArray *))complete{
++ (void)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys complete:(void (^)(NSArray *))complete{
     __block NSArray *mos = nil;
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         mos = [context bulkGetOrCreateObjects:NSStringFromClass(self) allProps:json eqKeys:eqKeys upKeys:upKeys];
@@ -167,39 +167,39 @@ static NSManagedObjectContext * __main_context__ = nil;
     return err;
 }
 
-+ (NSFetchedResultsController *)controllerWithEqualProps:(NSDictionary *)equalProps sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
-    NSFetchRequest *req = [self requestWithEqualProps:equalProps sorts:sorts options:options];
-    NSFetchedResultsController *frc = [self controllerWithRequest:req context:context options:options];
++ (NSFetchedResultsController *)controllerWithEqualProps:(NSDictionary *)equalProps sorts:(NSArray *)sorts section:(NSString *)section context:(NSManagedObjectContext *)context{
+    NSFetchRequest *req = [self requestWithEqualProps:equalProps sorts:sorts section:section];
+    NSFetchedResultsController *frc = [self controllerWithRequest:req context:context section:section];
     [frc performFetch:nil];
     return frc;
 }
 
-+ (NSFetchRequest *)requestWithEqualProps:(NSDictionary *)equalProps sorts:(NSArray *)sorts options:(NSDictionary *)options{
++ (NSFetchRequest *)requestWithEqualProps:(NSDictionary *)equalProps sorts:(NSArray *)sorts section:(NSString *)section{
     NSPredicate *pred = nil;
     if(equalProps && [equalProps count] > 0)
         pred = [NSPredicate predicateForEqualProps:equalProps];
-    return [self requestWithPredicate:pred sorts:sorts options:options];
+    return [self requestWithPredicate:pred sorts:sorts];
 }
 
-+ (NSFetchedResultsController *)controllerWithProps:(NSArray *)props sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
-    NSFetchRequest *req = [self requestWithProps:props sorts:sorts options:options];
-    return [self controllerWithRequest:req context:context options:options];
++ (NSFetchedResultsController *)controllerWithProps:(NSArray *)props sorts:(NSArray *)sorts section:(NSString *)section context:(NSManagedObjectContext *)context{
+    NSFetchRequest *req = [self requestWithProps:props sorts:sorts section:section];
+    return [self controllerWithRequest:req context:context section:section];
 }
 
 
-+ (NSFetchRequest *)requestWithProps:(NSArray *)props sorts:(NSArray *)sorts options:(NSDictionary *)options{
++ (NSFetchRequest *)requestWithProps:(NSArray *)props sorts:(NSArray *)sorts section:(NSString *)section{
     NSPredicate *pred = nil;
     if(props && [props count] > 0)
         pred = [NSPredicate predicateForProps:props];
-    return [self requestWithPredicate:pred sorts:sorts options:options];
+    return [self requestWithPredicate:pred sorts:sorts];
 }
 
-+ (NSFetchedResultsController *)controllerWithPredicate:(NSPredicate *)predicate sorts:(NSArray *)sorts context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
-    NSFetchRequest *req = [self requestWithPredicate:predicate sorts:sorts options:options];
-    return [self controllerWithRequest:req context:context options:options];
++ (NSFetchedResultsController *)controllerWithPredicate:(NSPredicate *)predicate sorts:(NSArray *)sorts section:(NSString *)section context:(NSManagedObjectContext *)context{
+    NSFetchRequest *req = [self requestWithPredicate:predicate sorts:sorts];
+    return [self controllerWithRequest:req context:context section:section];
 }
 
-+ (NSFetchRequest *)requestWithPredicate:(NSPredicate *)predicate sorts:(NSArray *)sorts options:(NSDictionary *)options{
++ (NSFetchRequest *)requestWithPredicate:(NSPredicate *)predicate sorts:(NSArray *)sorts{
     NSString *class_name = [NSString stringWithCString:class_getName(self) encoding:NSUTF8StringEncoding];
     NSFetchRequest *req = [NSFetchRequest fetchRequestWithEntityName:class_name];
     NSMutableArray *_sorts = [@[] mutableCopy];
@@ -221,10 +221,10 @@ static NSManagedObjectContext * __main_context__ = nil;
     return req;
 }
 
-+ (NSFetchedResultsController *)controllerWithRequest:(NSFetchRequest *)request context:(NSManagedObjectContext *)context options:(NSDictionary *)options{
++ (NSFetchedResultsController *)controllerWithRequest:(NSFetchRequest *)request context:(NSManagedObjectContext *)context section:(NSString *)section{
     if(!context)
         context = [self mainContext];
-    NSFetchedResultsController *frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:context sectionNameKeyPath:options[@"sectionNameKeyPath"] cacheName:nil];
+    NSFetchedResultsController *frc = [[NSFetchedResultsController alloc] initWithFetchRequest:request managedObjectContext:context sectionNameKeyPath:section cacheName:nil];
     return frc;
 }
 
