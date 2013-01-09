@@ -50,6 +50,7 @@
 		347C4EE1169C02DE00466605 /* TestChild.m in Sources */ = {isa = PBXBuildFile; fileRef = 347C4EDB169C02DE00466605 /* TestChild.m */; };
 		347C4EE2169C02DE00466605 /* testmodel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 347C4EDC169C02DE00466605 /* testmodel.xcdatamodeld */; };
 		347C4EEC169C075D00466605 /* TestParent.m in Sources */ = {isa = PBXBuildFile; fileRef = 347C4EEB169C075C00466605 /* TestParent.m */; };
+		607442D0FB234DF18A82CCEA /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 44C3402B115640BFBB050967 /* libPods.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -116,6 +117,8 @@
 		347C4EDD169C02DE00466605 /* testmodel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = testmodel.xcdatamodel; sourceTree = "<group>"; };
 		347C4EEA169C075C00466605 /* TestParent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TestParent.h; sourceTree = "<group>"; };
 		347C4EEB169C075C00466605 /* TestParent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TestParent.m; sourceTree = "<group>"; };
+		44C3402B115640BFBB050967 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		BF8F8C85356E4A8DAC6DBEAC /* Pods.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.xcconfig; path = Pods/Pods.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -127,6 +130,7 @@
 				3478B22C169BF6E400DDF9DB /* UIKit.framework in Frameworks */,
 				3478B22E169BF6E400DDF9DB /* Foundation.framework in Frameworks */,
 				3478B230169BF6E400DDF9DB /* CoreGraphics.framework in Frameworks */,
+				607442D0FB234DF18A82CCEA /* libPods.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,6 +156,7 @@
 				3478B24F169BF6E400DDF9DB /* na_ios_coredata_testTests */,
 				3478B22A169BF6E400DDF9DB /* Frameworks */,
 				3478B228169BF6E400DDF9DB /* Products */,
+				BF8F8C85356E4A8DAC6DBEAC /* Pods.xcconfig */,
 			);
 			sourceTree = "<group>";
 		};
@@ -172,6 +177,7 @@
 				3478B22D169BF6E400DDF9DB /* Foundation.framework */,
 				3478B22F169BF6E400DDF9DB /* CoreGraphics.framework */,
 				3478B249169BF6E400DDF9DB /* SenTestingKit.framework */,
+				44C3402B115640BFBB050967 /* libPods.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -337,6 +343,7 @@
 				3478B223169BF6E400DDF9DB /* Sources */,
 				3478B224169BF6E400DDF9DB /* Frameworks */,
 				3478B225169BF6E400DDF9DB /* Resources */,
+				6369549DC58E41E3869855B4 /* Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -428,6 +435,20 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+		6369549DC58E41E3869855B4 /* Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Pods-resources.sh\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -558,6 +579,7 @@
 		};
 		3478B25B169BF6E400DDF9DB /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF8F8C85356E4A8DAC6DBEAC /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "na_ios_coredata_test/na_ios_coredata_test-Prefix.pch";
@@ -569,6 +591,7 @@
 		};
 		3478B25C169BF6E400DDF9DB /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF8F8C85356E4A8DAC6DBEAC /* Pods.xcconfig */;
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "na_ios_coredata_test/na_ios_coredata_test-Prefix.pch";
@@ -580,6 +603,7 @@
 		};
 		3478B25E169BF6E400DDF9DB /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF8F8C85356E4A8DAC6DBEAC /* Pods.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/na_ios_coredata_test.app/na_ios_coredata_test";
 				FRAMEWORK_SEARCH_PATHS = (
@@ -597,6 +621,7 @@
 		};
 		3478B25F169BF6E400DDF9DB /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = BF8F8C85356E4A8DAC6DBEAC /* Pods.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(BUILT_PRODUCTS_DIR)/na_ios_coredata_test.app/na_ios_coredata_test";
 				FRAMEWORK_SEARCH_PATHS = (

@@ -100,6 +100,7 @@
     [TestParent create:@{@"name": @"test"} complete:^(id mo) {
         TestParent *pa = (TestParent *)mo;
         STAssertTrue([pa isKindOfClass:[TestParent class]], @"async create");
+        NSLog(@"%s|%@", __PRETTY_FUNCTION__, [pa name]);
         STAssertTrue([@"test" isEqualToString:[pa name]], nil);
         STAsynchronousTestDone(asynccreate);
     }];
@@ -138,6 +139,8 @@
     
     [TestParent get_or_create:@{@"name": @"test"} complete:^(id mo) {
         TestParent *pa1 = (TestParent *)mo;
+        NSManagedObjectContext *context = pa1.managedObjectContext;
+        STAssertTrue(context.concurrencyType == NSMainQueueConcurrencyType, @"ちゃんとmain threadのmo??");
         NSArray *mos = [TestParent filter:nil];
         STAssertTrue([mos count] == 2, nil);
         
@@ -166,7 +169,7 @@
 {
     STAsynchronousTestStart(getorcreateasyncupdate);
     
-    [TestParent get_or_create:@{@"name": @"test3"} update:@{@"hoge": @"hoge1", @"subdoc": @{@"fuga": @"fuga1"}} complete:^(TestParent * mo) {
+    [TestParent get_or_create:@{@"name": @"test3", @"hoge": @"hoge1", @"subdoc": @{@"fuga": @"fuga1"}} eqKeys:@[@"name"] complete:^(TestParent * mo) {
         //        create
         STAssertTrue([mo.name isEqualToString:@"test3"], nil);
         //        update
@@ -205,7 +208,7 @@
     json = @[@{@"name": @"test10", @"hoge": @"hoge1"}, @{@"name": @"test12"}];
     
     //    bulk_get_or_create
-    objs = [TestParent bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge"]];
+    objs = [TestParent bulk_get_or_create:json eqKeys:@[@"name"]];
     pa1 = objs[0];
     
     STAssertTrue([pa1.hoge isEqualToString:@"hoge1"], @"update");
@@ -231,11 +234,11 @@
     
     NSArray *json = @[@{@"name": @"test13"}, @{@"name": @"test14"}];
     
-    [TestParent bulk_create:json complete:^(NSArray *mos) {
-        TestParent *pa1 = mos[0];
+    [TestParent bulk_create:json complete:^(NSArray *moids) {
+        TestParent *pa1 = [TestParent objectWithID:moids[0]];
         
         STAssertTrue([pa1.name isEqualToString:@"test13"], @"名前");
-        TestParent *pa2 = mos[1];
+        TestParent *pa2 = [TestParent objectWithID:moids[1]];
         
         STAssertTrue([pa2.name isEqualToString:@"test14"], @"名前");
         STAsynchronousTestDone(getorcreateasyncupdate);
@@ -248,8 +251,10 @@
     
     json = @[@{@"name": @"test13", @"hoge": @"hoge3", @"subdoc": @{@"fuga": @"fuga3"}}, @{@"name": @"test15"}];
     
-    [TestParent bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge", @"subdoc__fuga"] complete:^(NSArray *mos) {
-        TestParent *mo = mos[0];
+    [TestParent bulk_get_or_create:json eqKeys:@[@"name"] complete:^(NSArray *moids) {
+        TestParent *mo = [TestParent objectWithID:moids[0]];
+        NSManagedObjectContext *context = mo.managedObjectContext;
+        STAssertTrue(context.concurrencyType == NSMainQueueConcurrencyType, @"ちゃんとmain threadのmo??");
         //        create
         STAssertTrue([mo.name isEqualToString:@"test13"], nil);
         //        update

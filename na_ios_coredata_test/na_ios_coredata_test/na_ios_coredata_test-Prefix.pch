@@ -11,6 +11,7 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
+#import <BlocksKit/BlocksKit.h>
 #import "na_ios_categories_general.h"
 #import "na_ios_macros_general.h"
 #import "na_ios_async.h"

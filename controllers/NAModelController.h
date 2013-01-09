@@ -51,8 +51,7 @@ extern NSString * const NAModelControllerInitializedNotification;
 //- (void)migrate:(NSString *)newpath newversion:(NSInteger)newversion;
 
 // わざわざ継承しなくても済むようにしたい
-+ (NAModelController *)createControllerByName:(NSString *)name bundle:(NSBundle *)bundle;
-+ (NAModelController *)getControllerByName:(NSString *)name;
++ (NAModelController *)controllerByName:(NSString *)name bundle:(NSBundle *)bundle;
 + (NAModelController *)getControllerByClass:(Class)kls;
 
 - (void)addManagedObjectClasses:(NSArray *)objects;

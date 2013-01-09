@@ -60,11 +60,15 @@ static NSManagedObjectContext * __main_context__ = nil;
 }
 
 + (id)get_or_create:(NSDictionary *)props{
-    return [self get_or_create:props update:nil];
+    return [self _get_or_create:props eqKeys:nil isUpdate:NO];
 }
 
-+ (id)get_or_create:(NSDictionary *)props update:(NSDictionary *)update{
-    NSManagedObjectContextGetOrCreateDictionary *dic = [[self mainContext] getOrCreateObject:NSStringFromClass(self) props:props update:update];
++ (id)get_or_create:(NSDictionary *)json eqKeys:(NSArray *)eqKeys{
+    return [self _get_or_create:json eqKeys:eqKeys isUpdate:YES];
+}
+
++ (id)_get_or_create:(NSDictionary *)json eqKeys:(NSArray *)eqKeys isUpdate:(BOOL)isUpdate{
+    NSManagedObjectContextGetOrCreateDictionary *dic = [[self mainContext] getOrCreateObject:NSStringFromClass(self) allProps:json eqKeys:eqKeys isUpdate:isUpdate];
     NSManagedObject *obj = dic.object;
     return obj;
 }
@@ -73,65 +77,97 @@ static NSManagedObjectContext * __main_context__ = nil;
     return [[self mainContext] bulkCreateObjects:NSStringFromClass(self) props:json];
 }
 
-+ (NSArray *)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys{
-    return [[self mainContext] bulkGetOrCreateObjects:NSStringFromClass(self) allProps:json eqKeys:eqKeys upKeys:upKeys];
++ (NSArray *)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys{
+    return [[self mainContext] bulkGetOrCreateObjects:NSStringFromClass(self) allProps:json eqKeys:eqKeys isUpdate:YES];
 }
 
 + (id)objectWithID:(NSManagedObjectID *)objectID{
     return [[self mainContext] objectWithID:objectID];
 }
 
-+ (void)filter:(NSDictionary *)props complete:(void(^)(NSArray *mos))complete{
+#pragma mark 非同期API
+#warning 現状NSManagedObject自体を別スレッドに投げて、別スレッドではobjectIDにアクセスして、mainContextから新しく引っ張ってきている．
+// これは多分本当はダメ？？NSNotificationから引っ張ってくるとNSSetになって順番が失われてしまう．．
+// https://developer.apple.com/library/ios/#documentation/Cocoa/Reference/CoreDataFramework/Classes/NSManagedObjectContext_Class/NSManagedObjectContext.html
+
+//Posted whenever a managed object context completes a save operation.
+//The notification object is the managed object context. The userInfo dictionary contains the following keys: NSInsertedObjectsKey, NSUpdatedObjectsKey, and NSDeletedObjectsKey.
+//
+//You can only use the managed objects in this notification on the same thread on which it was posted.
+//
+//You can pass the notification object to mergeChangesFromContextDidSaveNotification: on another thread, however you must not use the managed object in the user info dictionary directly on another thread. For more details, see “Concurrency with Core Data”.
+//この感じだと、userInfo dictionaryに入っているのは別contextのmoで、そこからobjectIDを取り出せ、と
+
++ (void)filter:(NSDictionary *)props complete:(void(^)(NSArray *moids))complete{
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         NSArray *mos = [context filterObjects:NSStringFromClass(self) props:props];
+        NSArray *moids = [mos map:^id(NSManagedObject * mo) {
+            return mo.objectID;
+        }];
         if(complete)
             dispatch_async(dispatch_get_main_queue(), ^{
-                complete(mos);
+                complete(moids);
             });
-    } afterSaveOnMainThread:nil];
+    } afterSave:nil];
 }
 
 + (void)get:(NSDictionary *)props complete:(void(^)(id mo))complete{
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
-        id mo = [context getObject:NSStringFromClass(self) props:props];
+        NSManagedObject * mo = [context getObject:NSStringFromClass(self) props:props];
+        NSManagedObjectID *moid = mo.objectID;
         if(complete)
             dispatch_async(dispatch_get_main_queue(), ^{
-                complete(mo);
+                id mainmo = [[self mainContext] objectWithID:moid];
+                complete(mainmo);
             });
-    } afterSaveOnMainThread:nil];
+    } afterSave:nil];
 }
 
 + (void)create:(NSDictionary *)props complete:(void(^)(id mo))complete{
-    __block id mo = nil;
+    __block NSManagedObject *mo = nil;
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         mo = [context createObject:NSStringFromClass(self) props:props];
         [context save:nil];
-    } afterSaveOnMainThread:^(NSNotification *note) {
-        if(complete)
-            complete(mo);
+    } afterSave:^(NSNotification *note) {
+        if(complete){
+            NSManagedObjectID *moid = mo.objectID;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                id mainmo = [[self mainContext] objectWithID:moid];
+                complete(mainmo);
+            });
+        }
     }];
 }
 
 + (void)get_or_create:(NSDictionary *)props complete:(void(^)(id mo))complete{
-    [self get_or_create:props update:nil complete:complete];
+    [self _get_or_create:props eqKeys:nil isUpdate:NO complete:complete];
+}
++ (void)get_or_create:(NSDictionary *)json eqKeys:(NSArray *)eqKeys complete:(void (^)(id))complete{
+    [self _get_or_create:json eqKeys:eqKeys isUpdate:YES complete:complete];
 }
 
-+ (void)get_or_create:(NSDictionary *)props update:(NSDictionary *)update complete:(void (^)(id))complete{
-    __block id mo = nil;
++ (void)_get_or_create:(NSDictionary *)json eqKeys:(NSArray *)eqKeys isUpdate:(BOOL)isUpdate complete:(void (^)(id))complete{
+    __block NSManagedObject *mo = nil;
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
-        NSManagedObjectContextGetOrCreateDictionary *dic = [context getOrCreateObject:NSStringFromClass(self) props:props update:update];
+        NSManagedObjectContextGetOrCreateDictionary *dic = [context getOrCreateObject:NSStringFromClass(self) allProps:json eqKeys:eqKeys isUpdate:isUpdate];
         mo = dic.object;
-        if(dic.is_created || (update && [update count] > 0) ){
+        if(dic.is_created || isUpdate ){
             [context save:nil];
         }else{
             if(complete)
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    complete(mo);
+                    id mainmo = [[self mainContext] objectWithID:mo.objectID];
+                    complete(mainmo);
                 });
         }
-    } afterSaveOnMainThread:^(NSNotification *note) {
-        if(complete)
-            complete(mo);
+    } afterSave:^(NSNotification *note) {
+        if(complete){
+            NSManagedObjectID *moid = mo.objectID;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                id mainmo = [[self mainContext] objectWithID:moid];
+                complete(mainmo);
+            });
+        }
     }];
 }
 
@@ -140,20 +176,35 @@ static NSManagedObjectContext * __main_context__ = nil;
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         mos = [context bulkCreateObjects:NSStringFromClass(self) props:json];
         [context save:nil];
-    } afterSaveOnMainThread:^(NSNotification *note) {
-        if(complete)
-            complete(mos);
+    } afterSave:^(NSNotification *note) {
+        if(complete){
+            NSArray *moids = [mos map:^id(NSManagedObject *mo) {
+                return mo.objectID;
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                complete(moids);
+            });
+        }
     }];
 }
++ (void)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys complete:(void (^)(NSArray *))complete{
+    [self _bulk_get_or_create:json eqKeys:eqKeys isUpdate:YES complete:complete];
+}
 
-+ (void)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys complete:(void (^)(NSArray *))complete{
++ (void)_bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys isUpdate:(BOOL)isUpdate complete:(void (^)(NSArray *))complete{
     __block NSArray *mos = nil;
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
-        mos = [context bulkGetOrCreateObjects:NSStringFromClass(self) allProps:json eqKeys:eqKeys upKeys:upKeys];
+        mos = [context bulkGetOrCreateObjects:NSStringFromClass(self) allProps:json eqKeys:eqKeys isUpdate:isUpdate];
         [context save:nil];
-    } afterSaveOnMainThread:^(NSNotification *note) {
-        if(complete)
-            complete(mos);
+    } afterSave:^(NSNotification *note) {
+        if(complete){
+            NSArray *moids = [mos map:^id(NSManagedObject *mo) {
+                return mo.objectID;
+            }];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                complete(moids);
+            });
+        }
     }];
 }
 

@@ -106,10 +106,14 @@
     return dic;
 }
 
-- (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName allProps:(NSDictionary *)allProps eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys{
-    NSDictionary *props = [self _props:allProps keys:eqKeys];
-    NSDictionary *update = [self _props:allProps keys:upKeys];
-    return [self getOrCreateObject:entityName props:props update:update];
+- (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName allProps:(NSDictionary *)allProps eqKeys:(NSArray *)eqKeys isUpdate:(BOOL)isUpdate{
+    NSDictionary *props = allProps;
+    if(eqKeys)
+        props = [self _props:allProps keys:eqKeys];
+    NSDictionary *json = nil;
+    if(isUpdate)
+        json = allProps;
+    return [self getOrCreateObject:entityName props:props update:allProps];
 }
 
 #pragma mark bulk操作
@@ -141,12 +145,16 @@
     return result;
 }
 
-- (NSArray *)bulkGetOrCreateObjects:(NSString *)entityName allProps:(NSArray *)allPropss eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys{
+- (NSArray *)bulkGetOrCreateObjects:(NSString *)entityName allProps:(NSArray *)allPropss eqKeys:(NSArray *)eqKeys isUpdate:(BOOL)isUpdate{
     NSMutableArray *result = [@[] mutableCopy];
     for(NSDictionary *allProps in allPropss){
-        NSDictionary *props = [self _props:allProps keys:eqKeys];
-        NSDictionary *update = [self _props:allProps keys:upKeys];
-        NSManagedObjectContextGetOrCreateDictionary *dic = [self getOrCreateObject:entityName props:props update:update];
+        NSDictionary *props = allProps;
+        if(eqKeys)
+            props = [self _props:allProps keys:eqKeys];
+        NSDictionary *json = nil;
+        if(isUpdate)
+            json = allProps;
+        NSManagedObjectContextGetOrCreateDictionary *dic = [self getOrCreateObject:entityName props:props update:json];
         NSManagedObject *obj = dic.object;
         [result addObject:obj];
     }
@@ -184,20 +192,29 @@
 }
 
 - (void)performBlockOutOfOwnThread:(void(^)(NSManagedObjectContext *context))block afterSaveOnMainThread:(void(^)(NSNotification *note))afterSaveOnMainThread{
+    if(afterSaveOnMainThread){
+        [self performBlockOutOfOwnThread:block afterSave:^(NSNotification *note) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                afterSaveOnMainThread(note);
+            });
+        }];
+    }else{
+        [self performBlockOutOfOwnThread:block afterSave:nil];
+    }
+}
+
+- (void)performBlockOutOfOwnThread:(void(^)(NSManagedObjectContext *context))block afterSave:(void(^)(NSNotification *note))afterSave{
     NSPersistentStoreCoordinator *coordinator = self.persistentStoreCoordinator;
     NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
     [context setPersistentStoreCoordinator:coordinator];
     context.mergePolicy = NSOverwriteMergePolicy;
-    if(afterSaveOnMainThread){
+    if(afterSave){
         [[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:context queue:nil usingBlock:^(NSNotification *note) {
             [self performSelectorOnMainThread:@selector(mergeChangesFromContextDidSaveNotification:)
                                           withObject:note
                                        waitUntilDone:YES];
-            if(afterSaveOnMainThread){
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    afterSaveOnMainThread(note);
-                });
-            }
+            if(afterSave)
+                afterSave(note);
         }];
     }
     

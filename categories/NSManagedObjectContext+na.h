@@ -31,21 +31,22 @@
  upKeys: アップデートに使うフィールド名
  */
 - (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName props:(NSDictionary *)props;
-- (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName props:(NSDictionary *)props update:(NSDictionary *)update;
-- (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName allProps:(NSDictionary *)allProps eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys;
+//- (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName props:(NSDictionary *)props update:(NSDictionary *)update;
+- (NSManagedObjectContextGetOrCreateDictionary *)getOrCreateObject:(NSString *)entityName allProps:(NSDictionary *)allProps eqKeys:(NSArray *)eqKeys isUpdate:(BOOL)isUpdate;
 
 /*
  bulk操作
  */
 - (NSArray *)bulkCreateObjects:(NSString *)entityName props:(NSArray *)propss;
-- (NSArray *)bulkGetOrCreateObjects:(NSString *)entityName props:(NSArray *)propss;
+//- (NSArray *)bulkGetOrCreateObjects:(NSString *)entityName props:(NSArray *)propss;
 - (NSArray *)bulkGetOrCreateObjects:(NSString *)entityName props:(NSArray *)propss updates:(NSArray *)updates;
-- (NSArray *)bulkGetOrCreateObjects:(NSString *)entityName allProps:(NSArray *)allProps eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys;
+- (NSArray *)bulkGetOrCreateObjects:(NSString *)entityName allProps:(NSArray *)allProps eqKeys:(NSArray *)eqKeys isUpdate:(BOOL)isUpdate;
 
 /** 別のcontextを作るのがそもそもめんどくさい人のため．
  caution!!!! mainthreadにあるmainContextからのみ呼び出せる！！
  */
-- (void)performBlockOutOfOwnThread:(void(^)(NSManagedObjectContext *context))block afterSaveOnMainThread:(void(^)(NSNotification *note))afterSaveOnMainThread;
+//- (void)performBlockOutOfOwnThread:(void(^)(NSManagedObjectContext *context))block afterSaveOnMainThread:(void(^)(NSNotification *note))afterSaveOnMainThread;
+- (void)performBlockOutOfOwnThread:(void(^)(NSManagedObjectContext *context))block afterSave:(void(^)(NSNotification *note))afterSave;
 
 #pragma mark delete
 

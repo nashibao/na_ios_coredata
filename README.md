@@ -1,4 +1,4 @@
-`na_ios_coredata`
+# `na_ios_coredata`
 
 `na_ios_coredata`は、扱うのに経験が必要なcoredataを、簡単に扱えるようにするモジュールです．
 
@@ -24,13 +24,26 @@
   // hogehoge
 }];
 
-[TestObject bulk_get_or_create:@[@{@"name": @"test"}, @{@"name": @"test2"} ] complete:^(id mo) {
-  // hogehoge
+// スキーマレス、サブドキュメントマッピングの例
+NSDictionary *json = @{
+	@"name": @"test",
+	@"hoge": @"hogehoge",
+	@"subdoc": @{
+		@"fuga": @"fugafuga"
+	}
+};
+[TestObject get_or_create:json eqKeys:@[@"name"] complete:^(id obj) {
+	obj.name //->@"test"
+	obj.hoge //->@"hogehoge"
+	obj.data[@"hoge"] //->@"hogehoge"
+	obj.subdoc__fuga //->@"fugafuga"
 }];
 
 ```
 
-`create`や`get_or_create`はcontextに変更を加える可能性がありますが、その場合は、`TestObject`に登録した`mainContext`(main thread上のcontext)に変更がマージされてから`complete`ハンドラは呼ばれます．そのため、`complete`ハンドラ内でUIを更新すると、変更分も表示されることになります．
+`create`や`get_or_create`、`bulk_get_or_create`はcontextに変更を加える可能性がありますが、その場合は、`TestObject`に登録した`mainContext`(main thread上のcontext)に変更がマージされてから`complete`ハンドラは呼ばれます．そのため、`complete`ハンドラ内でUIを更新すると、変更分も表示されることになります．
+
+`get_or_create`や`bulk_get_or_create`は`eqKeys`プロパティを持つ事が出来ます．これはマッチングに`eqKeys`で指定したデータを使い、残りは単純にアップデートに使います．
 
 また、同じようにして、ハンドラを渡さない同期メソッドもあります．
 
@@ -40,25 +53,6 @@ NSArray *objs = [TestObject filter:@{@"name": @"test"}];
 TestObject *obj2 = [TestObject get_or_create:@{@"name": @"test"}];
 Bool bl = (obj == obj2); => YES
 ```
-
-また`get_or_create`では取ってきたデータに対してアップデートをすることが出来ます. セレクトに使う`eqKeys`とアップデートに使う`upKeys`をそれぞれ設定して下さい．
-
-```objective-c
-NSDictionary *json = @[@{@"name": @"test", @"hoge": @"hogehoge", @"subdoc": @{@"fuga": @"fugafuga"}}, @{@"name": @"test2"}];
-
-[TestObject bulk_get_or_create:json eqKeys:@[@"name"] upKeys:@[@"hoge", @"subdoc__fuga"] complete:^(NSArray *mos) {
-    TestObject *obj = mos[0];
-    //        create
-    STAssertTrue([obj.name isEqualToString:@"test"], nil);
-    //        update
-    STAssertTrue([obj.hoge isEqualToString:@"hogehoge"], nil);
-    //        スキーマレス
-    STAssertTrue([obj.data[@"hoge"] isEqualToString:@"hogehoge"], nil);
-    //        dot syntax
-    STAssertTrue([obj.subdoc__fuga isEqualToString:@"fugafuga"], nil);
-}];
-```
-スキーマレスやサブドキュメントアクセス`@"subdoc__fuga"`については`スキーマレス・コアデータのススメ`を読んで下さい．
 
 最後に、独自にcoredata上でスレッドを作成したい上級者向けには、次のようなメソッドがあります．
 
@@ -105,7 +99,7 @@ NSManagedObjectContext *context = [[NSManagedObjectContext alloc] initWithConcur
 `hoge.modeld`の中に`TestObject`と`TestObject2`が入っている場合、AppDelegateなどで、次のように書いて下さい．
 
 ```objective-c
-NAModelController *controller = [NAModelController createControllerByName:@"hoge" bundle:nil];
+NAModelController *controller = [NAModelController controllerByName:@"hoge"];
 [controller addManagedObjectClasses:@[[TestObject class], [TestObject2 class]]];
 ```
 
@@ -113,7 +107,6 @@ NAModelController *controller = [NAModelController createControllerByName:@"hoge
 
 # スキーマレス・コアデータのススメ
 
-(以下の設定は、`na_ios_coredata`のAPIではデフォルトで有効です．)
 `na_ios_coredata`では、次の理由から、スキーマレスな`NSManagedObject`を標準で採用しています．
 
  1. スキーマ変更によるアップデート時のmigration

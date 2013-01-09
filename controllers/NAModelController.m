@@ -113,8 +113,10 @@ static NSMutableDictionary *__class_reference__ = nil;
     return controller;
 }
 
-+ (NAModelController *)createControllerByName:(NSString *)name bundle:(NSBundle *)bundle{
-    NAModelController *controller = [self _createControllerByName:name bundle:bundle];
++ (NAModelController *)controllerByName:(NSString *)name bundle:(NSBundle *)bundle{
+    NAModelController *controller = [self getControllerByName:name];
+    if(!controller)
+        controller = [self _createControllerByName:name bundle:bundle];
     __namodel_controllers__[name] = controller;
     return controller;
 }

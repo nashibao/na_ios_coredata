@@ -18,19 +18,20 @@
 + (id)get:(NSDictionary *)props;
 + (id)create:(NSDictionary *)props;
 + (id)get_or_create:(NSDictionary *)props;
-+ (id)get_or_create:(NSDictionary *)props update:(NSDictionary *)update;
++ (id)get_or_create:(NSDictionary *)json eqKeys:(NSArray *)eqKeys;
 + (NSArray *)bulk_create:(NSArray *)json;
-+ (NSArray *)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys;
++ (NSArray *)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys;
 + (id)objectWithID:(NSManagedObjectID *)objectID;
 
-#warning !! completeハンドラで返す値はmain threadで扱えない．NSManagedObjectIDの列に修正すべき！
-+ (void)filter:(NSDictionary *)props complete:(void(^)(NSArray *mos))complete;
+
+#pragma mark 非同期API
++ (void)filter:(NSDictionary *)props complete:(void(^)(NSArray *moids))complete;
 + (void)get:(NSDictionary *)props complete:(void(^)(id mo))complete;
 + (void)create:(NSDictionary *)props complete:(void(^)(id mo))complete;
 + (void)get_or_create:(NSDictionary *)props complete:(void(^)(id mo))complete;
-+ (void)get_or_create:(NSDictionary *)props update:(NSDictionary *)update complete:(void(^)(id mo))complete;
-+ (void)bulk_create:(NSArray *)json complete:(void(^)(NSArray * mos))complete;
-+ (void)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys upKeys:(NSArray *)upKeys complete:(void(^)(NSArray * mos))complete;
++ (void)get_or_create:(NSDictionary *)json eqKeys:(NSArray *)eqKeys complete:(void(^)(id mo))complete;
++ (void)bulk_create:(NSArray *)json complete:(void(^)(NSArray * moids))complete;
++ (void)bulk_get_or_create:(NSArray *)json eqKeys:(NSArray *)eqKeys complete:(void(^)(NSArray * moids))complete;
 
 + (void)delete_all;
 
