@@ -45,8 +45,8 @@
 /** 別のcontextを作るのがそもそもめんどくさい人のため．
  caution!!!! mainthreadにあるmainContextからのみ呼び出せる！！
  */
-//- (void)performBlockOutOfOwnThread:(void(^)(NSManagedObjectContext *context))block afterSaveOnMainThread:(void(^)(NSNotification *note))afterSaveOnMainThread;
 - (void)performBlockOutOfOwnThread:(void(^)(NSManagedObjectContext *context))block afterSave:(void(^)(NSNotification *note))afterSave;
+- (void)performBlockOutOfOwnThread:(void(^)(NSManagedObjectContext *context))block afterSaveOnMainThread:(void(^)(NSNotification *note))afterSaveOnMainThread;
 
 #pragma mark delete
 
