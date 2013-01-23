@@ -151,15 +151,15 @@ static NSManagedObjectContext * __main_context__ = nil;
     [[self mainContext] performBlockOutOfOwnThread:^(NSManagedObjectContext *context) {
         NSManagedObjectContextGetOrCreateDictionary *dic = [context getOrCreateObject:NSStringFromClass(self) allProps:json eqKeys:eqKeys isUpdate:isUpdate];
         mo = dic.object;
-        if(dic.is_created || isUpdate ){
+//        if(dic.is_created || isUpdate ){
             [context save:nil];
-        }else{
-            if(complete)
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    id mainmo = [[self mainContext] objectWithID:mo.objectID];
-                    complete(mainmo);
-                });
-        }
+//        }else{
+//            if(complete)
+//                dispatch_async(dispatch_get_main_queue(), ^{
+//                    id mainmo = [[self mainContext] objectWithID:mo.objectID];
+//                    complete(mainmo);
+//                });
+//        }
     } afterSave:^(NSNotification *note) {
         if(complete){
             NSManagedObjectID *moid = mo.objectID;
