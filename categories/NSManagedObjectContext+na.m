@@ -35,7 +35,7 @@
         }
     }
     @catch (NSException *exception) {
-        NSLog(@"%s:%@",__FUNCTION__,exception);
+        //gNSLog(@"%s:%@",__FUNCTION__,exception);
     }
     @finally {
     }
@@ -60,7 +60,7 @@
         }
     }
     @catch (NSException *exception) {
-        NSLog(@"%s:%@",__FUNCTION__,exception);
+        //gNSLog(@"%s:%@",__FUNCTION__,exception);
     }
     @finally {
     }
@@ -169,7 +169,7 @@
     @try {
         [self deleteObject:obj];
     }@catch (NSException *exception) {
-        NSLog(@"%s:%@",__FUNCTION__,@"already deleted");
+        //gNSLog(@"%s:%@",__FUNCTION__,@"already deleted");
     }@finally {
     }
 }
@@ -210,9 +210,9 @@
     context.mergePolicy = NSOverwriteMergePolicy;
     if(afterSave){
         [[NSNotificationCenter defaultCenter] addObserverForName:NSManagedObjectContextDidSaveNotification object:context queue:nil usingBlock:^(NSNotification *note) {
-            [self performSelectorOnMainThread:@selector(mergeChangesFromContextDidSaveNotification:)
-                                          withObject:note
-                                       waitUntilDone:YES];
+#warning なぜかエラー吐く事がある．．理由がいまのところ、定かじゃない．mergeOption関係？？
+            //                    http://stackoverflow.com/questions/5365928/coredata-crash-on-mergechangesfromcontextdidsavenotification-invalid-summary
+            [self performSelectorOnMainThread:@selector(_mergeChangesFromContextDidSaveNotification:) withObject:note waitUntilDone:YES];
             if(afterSave)
                 afterSave(note);
         }];
@@ -222,6 +222,18 @@
         if(block)
             block(context);
     }];
+}
+
+//直接mergeChangesを呼ばないのは、try catchするため．
+- (void)_mergeChangesFromContextDidSaveNotification:(NSNotification *)note{
+    @try {
+        [self mergeChangesFromContextDidSaveNotification:note];
+    }
+    @catch (NSException *exception) {
+        NSLog(@"%s|%@", __PRETTY_FUNCTION__, exception);
+    }
+    @finally {
+    }
 }
 
 @end

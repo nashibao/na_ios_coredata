@@ -29,12 +29,16 @@
     if ([value isKindOfClass:[NSData class]])
         return value;
     
-    return [NSKeyedArchiver archivedDataWithRootObject:value];
+    id retrnval = [NSKeyedArchiver archivedDataWithRootObject:value];
+    
+    return retrnval;
 }
 
 - (id)reverseTransformedValue:(id)value
 {
-    return [NSKeyedUnarchiver unarchiveObjectWithData:(NSData *)value];
+    id retrnval = [NSKeyedUnarchiver unarchiveObjectWithData:(NSData *)value];
+    
+    return retrnval;
 }
 
 @end

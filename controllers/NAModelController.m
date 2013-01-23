@@ -65,7 +65,7 @@ NSString * const NAModelControllerInitializedNotification = @"NAModelControllerI
     NSError *error = nil;
     self.coordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:self.model];
     if (![self.coordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeURL options:nil error:&error]) {
-        NSLog(@"persistent coodinator creation error %@, %@", error, [error userInfo]);
+        //gNSLog(@"persistent coodinator creation error %@, %@", error, [error userInfo]);
         abort();
     }
     
